@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bible Song Pro Interactive Demo</title>
+  <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+  <div class="demo-app" data-theme="skyline">
+    <aside class="sidebar">
+      <div class="brand-block">
+        <p class="eyebrow">Interactive Demo</p>
+        <h1>Bible Song Pro</h1>
+        <p class="subtle">A browser-based walkthrough of the OBS plugin workflow.</p>
+      </div>
+
+      <nav class="tab-row" aria-label="Content tabs">
+        <button class="tab-btn active" data-tab="songs">Songs</button>
+        <button class="tab-btn" data-tab="bible">Bible</button>
+        <button class="tab-btn" data-tab="setlist">Setlist</button>
+      </nav>
+
+      <div class="panel-card">
+        <label class="control-label" for="search-box">Search</label>
+        <input id="search-box" class="search-input" type="text" placeholder="Search sample content...">
+      </div>
+
+      <section class="panel-card">
+        <div class="section-head">
+          <h2 class="section-title">Content</h2>
+          <span class="badge">Demo data</span>
+        </div>
+        <div id="content-list" class="content-list"></div>
+      </section>
+    </aside>
+
+    <section class="workspace">
+      <header class="workspace-header">
+        <div>
+          <p class="eyebrow">Live preview controls</p>
+          <h2 id="selection-title">Select an item</h2>
+        </div>
+        <div class="header-actions">
+          <a class="ghost-link" href="index.html">Back</a>
+          <a class="ghost-link" href="../Bible-Song-Pro-plugin.zip">Download Plugin</a>
+        </div>
+      </header>
+
+      <div class="workspace-grid">
+        <section class="controls-pane">
+          <div class="panel-card">
+            <div class="section-head">
+              <h3 class="section-title">Mode</h3>
+            </div>
+            <div class="seg-row">
+              <button class="seg-btn active" data-mode="full">FULL</button>
+              <button class="seg-btn" data-mode="lt">LT</button>
+            </div>
+          </div>
+
+          <div class="panel-card">
+            <div class="section-head">
+              <h3 class="section-title">Theme</h3>
+            </div>
+            <select id="theme-select" class="demo-select">
+              <option value="skyline">Skyline</option>
+              <option value="sunset">Sunset</option>
+              <option value="liquid-glass">Liquid Glass</option>
+              <option value="paperlight">Paperlight</option>
+            </select>
+          </div>
+
+          <div class="panel-card">
+            <div class="section-head">
+              <h3 class="section-title">Lines</h3>
+            </div>
+            <select id="lines-select" class="demo-select">
+              <option value="1">1 line</option>
+              <option value="2">2 lines</option>
+              <option value="3">3 lines</option>
+              <option value="4">4 lines</option>
+              <option value="5">5 lines</option>
+              <option value="6">6 lines</option>
+            </select>
+          </div>
+
+          <div class="panel-card">
+            <div class="section-head">
+              <h3 class="section-title">Background Type</h3>
+            </div>
+            <select id="bg-type-select" class="demo-select">
+              <option value="color">Color</option>
+              <option value="gradient">Gradient</option>
+              <option value="image">Image</option>
+              <option value="video">Video</option>
+            </select>
+            <p id="bg-note" class="control-note">Solid color background selected.</p>
+          </div>
+
+          <div class="panel-card">
+            <div class="section-head">
+              <h3 class="section-title">Dual Bible Version</h3>
+            </div>
+            <label class="switch-row">
+              <input id="dual-toggle" type="checkbox">
+              <span>Enable stacked dual-version preview</span>
+            </label>
+          </div>
+
+          <div class="panel-card">
+            <div class="section-head">
+              <h3 class="section-title">Quick Notes</h3>
+            </div>
+            <ul class="notes-list">
+              <li>This is a browser demo, not the real OBS runtime.</li>
+              <li>Sample data is preloaded to make interaction immediate.</li>
+              <li>The output panel simulates the display/browser source experience.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="preview-pane">
+          <div class="display-frame">
+            <div id="display-stage" class="display-stage display-full bg-color">
+              <div id="display-reference" class="display-reference"></div>
+              <div id="display-main" class="display-main"></div>
+              <div id="display-secondary" class="display-secondary"></div>
+            </div>
+          </div>
+
+          <div class="panel-card details-card">
+            <div class="section-head">
+              <h3 class="section-title">Selected Item</h3>
+              <span id="item-kind" class="badge">None</span>
+            </div>
+            <p id="item-meta" class="subtle">Choose a song, Bible reference, or setlist item from the left panel.</p>
+            <button id="go-live-btn" class="primary-link button-like" type="button">Project To Preview</button>
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>
+  <script src="demo.js"></script>
+</body>
+</html>
