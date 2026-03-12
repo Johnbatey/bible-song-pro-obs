@@ -68,15 +68,6 @@ Current release: `Version 1.0`
 - Copyright: [COPYRIGHT.md](COPYRIGHT.md)
 - License: [LICENSE](LICENSE)
 
-## Interactive Demo
-
-An interactive browser demo is available in the `docs/` folder for GitHub Pages deployment.
-
-- Landing page: `docs/index.html`
-- Demo page: `docs/demo.html`
-
-This demo is a browser-based walkthrough of the plugin workflow. It is not a full OBS runtime replacement, but it gives users a hands-on preview of the interface and core features.
-
 ## Screenshots
 
 ### Main Interface
