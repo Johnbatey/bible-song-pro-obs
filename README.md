@@ -11,7 +11,7 @@ Current release: `Version 1.0`
 - `Auto-Retrieve Lyrics`
   Search and pull in lyrics quickly to speed up song preparation.
 - `Dual Bible Version`
-  Display and work with two Bible versions side by side for clearer comparison and projection flexibility.
+  Display and work with two Bible versions in a stacked layout for clearer comparison and projection flexibility.
 - `Multi-Language Interface`
   Switch the plugin interface language from settings.
 - `50+ Supported Languages`
