@@ -72,5 +72,4 @@ This plugin is provided free to help churches reach a wider audience with the me
 
 Donations are appreciated to support continued development and maintenance.
 
-- Email: `johnsonolakotan@gmail.com`
 - Instagram: `https://www.instagram.com/johnsonolakotan`
