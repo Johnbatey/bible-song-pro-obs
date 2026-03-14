@@ -72,14 +72,14 @@ Current release: `Version 1.0`
 
 ### Main Interface
 
-![Interface 01](assets/mockups/interface-01-screen.svg)
-![Lowerthird Mode](assets/mockups/lowerthird-screen.svg)
+![Interface 01](assets/mockups/rendered/interface-01-screen.png)
+![Lowerthird Mode](assets/mockups/rendered/lowerthird-screen.png)
 
 ### Standout Features
 
-![Auto-Retrieve Lyrics 02](assets/mockups/auto-lyrics-02-screen.svg)
-![Support for 50+ Languages](assets/mockups/languages-screen.svg)
-![Gradient Background](assets/mockups/gradient-screen.svg)
+![Auto-Retrieve Lyrics 02](assets/mockups/rendered/auto-lyrics-02-screen.png)
+![Support for 50+ Languages](assets/mockups/rendered/languages-screen.png)
+![Gradient Background](assets/mockups/rendered/gradient-screen.png)
 
 More screenshots are available in the `Bible Song Pro_Screenshot` folder.
 
