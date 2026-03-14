@@ -9242,6 +9242,9 @@
       border-color: var(--border);
       background: rgba(255, 255, 255, 0.06);
     }
+    #footer-bible-version-popover .footer-bv-item.marked {
+      background: rgba(255, 255, 255, 0.04);
+    }
     #footer-bible-version-popover .footer-bv-btn {
       width: 100%;
       border: none;
@@ -9257,6 +9260,39 @@
       text-align: left;
       justify-content: flex-start;
       cursor: pointer;
+    }
+    #footer-bible-version-popover .footer-bv-name {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    #footer-bible-version-popover .footer-bv-flags {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+      flex: 0 0 auto;
+    }
+    #footer-bible-version-popover .footer-bv-flag {
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    #footer-bible-version-popover .footer-bv-flag.primary {
+      background: rgba(10, 132, 255, 0.92);
+      border-color: rgba(125, 190, 255, 0.65);
+    }
+    #footer-bible-version-popover .footer-bv-flag.secondary {
+      background: rgba(46, 204, 113, 0.9);
+      border-color: rgba(143, 234, 176, 0.6);
     }
     #footer-bible-version-popover .footer-bv-btn:hover {
       background: rgba(255, 255, 255, 0.04);
@@ -58362,18 +58398,31 @@ isiSembulo
       list.appendChild(searchWrap);
       const itemRows = [];
       verKeys.forEach((ver) => {
+        const isPrimaryActive = activeBibleVersion === ver;
+        const isSecondaryActive = !!(dualVersionModeEnabled && dualVersionSecondaryId === ver);
+        const markerClass = (isPrimaryActive || isSecondaryActive) ? ' marked' : '';
         const wrapper = document.createElement('div');
-        wrapper.className = `footer-bv-item ${activeBibleVersion === ver ? 'active' : ''}`;
+        wrapper.className = `footer-bv-item ${isPrimaryActive ? 'active' : ''}${markerClass}`;
         wrapper.dataset.searchLabel = normalizeSearchText(ver);
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'footer-bv-btn';
+        const flags = [];
+        if (isPrimaryActive && dualVersionModeEnabled && dualVersionSecondaryId) {
+          flags.push('<span class="footer-bv-flag primary" title="Primary">1</span>');
+        } else if (isPrimaryActive) {
+          flags.push('<span class="footer-bv-flag primary" title="Active">✓</span>');
+        }
+        if (isSecondaryActive) {
+          flags.push('<span class="footer-bv-flag secondary" title="Secondary">2</span>');
+        }
         btn.innerHTML = `
           <svg class="footer-bv-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
             <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
           </svg>
-          <span>${esc(ver)}</span>
+          <span class="footer-bv-name">${esc(ver)}</span>
+          <span class="footer-bv-flags">${flags.join('')}</span>
         `;
         btn.onclick = () => {
           changeActiveBibleVersion(ver);
@@ -68577,7 +68626,6 @@ isiSembulo
         renderSongs();
       }
       if (closeModalAfter) closeModal('autoLyricsModal');
-      resetAutoLyricsState({ keepInputs: false });
       showToast(openEditor ? t('auto_lyrics_added_and_opened') : t('auto_lyrics_added_to_songs'));
       return newSong;
     }
@@ -69172,7 +69220,7 @@ isiSembulo
         }
         if (e.key === 'Tab' && !e.ctrlKey && !e.metaKey && !e.altKey) {
           e.preventDefault();
-          const footerTabs = ['songs', 'bible', 'schedule'];
+          const footerTabs = ['bible', 'songs', 'schedule'];
           const idx = Math.max(0, footerTabs.indexOf(sidebarTab));
           const direction = e.shiftKey ? -1 : 1;
           const next = footerTabs[(idx + direction + footerTabs.length) % footerTabs.length];
