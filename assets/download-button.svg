@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="132" viewBox="0 0 520 132" role="img" aria-labelledby="title desc">
+  <title id="title">Download Bible Song Pro v1.0</title>
+  <desc id="desc">Large download button for the Bible Song Pro release package.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#178bff"/>
+      <stop offset="100%" stop-color="#0a64f5"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-20%" width="120%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#062c67" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <rect x="6" y="6" width="508" height="120" rx="24" fill="url(#bg)"/>
+    <rect x="6.5" y="6.5" width="507" height="119" rx="23.5" fill="none" stroke="#8dc2ff" stroke-opacity="0.45"/>
+  </g>
+  <g fill="#ffffff">
+    <path d="M96 42c-4.4 0-8 3.6-8 8v28h16V50c0-4.4-3.6-8-8-8zm-20 18h12v18H76c-4.4 0-8-3.6-8-8v-2c0-4.4 3.6-8 8-8zm28 0h12c4.4 0 8 3.6 8 8v2c0 4.4-3.6 8-8 8h-12V60z"/>
+    <path d="M96 88l-18-18h12V54h12v16h12L96 88z"/>
+  </g>
+  <text x="150" y="56" fill="#d8ebff" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700" letter-spacing="0.12em">DOWNLOAD</text>
+  <text x="150" y="94" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="800">Bible Song Pro v1.0</text>
+</svg>
