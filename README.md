@@ -7,6 +7,8 @@ A modern church presentation system for OBS Studio that lets you display Bible v
 ## Preview
 
 ![Preview](assets/showcase/rendered/interface-01-card.png)
+![Lower Third Preview](assets/showcase/rendered/lowerthird-card.png)
+![Song Lyrics Search Preview](Bible%20Song%20Pro_Screenshot/Search%20Artist%20Lyrics.png)
 
 ---
 
