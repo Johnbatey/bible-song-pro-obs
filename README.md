@@ -24,6 +24,7 @@ A modern church presentation system for OBS Studio that lets you display Bible v
 ## Features
 
 - Real-time Bible verse display
+- Auto-Retrieve Lyrics
 - Real-time song lyrics presentation
 - Clean broadcast-style UI
 - Fully customizable display
