@@ -1,0 +1,79 @@
+{
+  "name": "bible-song-pro-vmix-desktop",
+  "version": "2.0.0",
+  "description": "Bible Song Pro desktop preview wrapper for macOS",
+  "main": "electron/main.js",
+  "author": "Johnson Olakotan",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "feedback:server": "node server/feedback-backend.js",
+    "pack:mac": "electron-builder --mac dir",
+    "dist:mac": "electron-builder --mac",
+    "pack:win": "electron-builder --win nsis portable",
+    "dist:win": "electron-builder --win",
+    "dist:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.biblesongpro.desktop",
+    "productName": "Bible Song Pro",
+    "files": [
+      "Bible Song Pro panel.html",
+      "BSP_display.html",
+      "index.html",
+      "assets/**/*",
+      "js/**/*",
+      "electron/**/*",
+      "package.json",
+      "README.md",
+      "LICENSE"
+    ],
+    "directories": {
+      "buildResources": "electron/resources",
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "bible-song-pro-icon.icns",
+      "identity": null,
+      "target": [
+        "dir",
+        "zip"
+      ],
+      "artifactName": "${productName}-${version}-mac-${arch}.${ext}"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "bible-song-pro-icon.ico",
+      "publisherName": "Johnson Olakotan"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "${productName} Setup-${version}-win-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName} Portable-${version}-win-${arch}.${ext}"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "zip"
+      ],
+      "icon": "electron/resources/linux-icon.png",
+      "category": "Utility",
+      "artifactName": "${productName}-${version}-linux-${arch}.${ext}"
+    }
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  }
+}

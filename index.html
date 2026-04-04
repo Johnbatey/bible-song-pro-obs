@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bible Song Pro Preview</title>
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --shell-top: #20242c;
+      --shell-bottom: #111319;
+      --screen-edge-top: #313641;
+      --screen-edge-bottom: #0f1117;
+      --divider: #2b3039;
+      --text: #f3f5f8;
+      --muted: #8f98a8;
+      --shadow:
+        0 28px 90px rgba(0, 0, 0, 0.5),
+        0 10px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+    }
+
+    .studio {
+      width: min(100vw - 28px, 1840px);
+      height: min(100vh - 28px, 980px);
+      border-radius: 26px;
+      background: linear-gradient(180deg, var(--shell-top), var(--shell-bottom));
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-rows: 22px 1fr 56px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .camera-notch {
+      width: 220px;
+      height: 22px;
+      margin: 0 auto;
+      border-radius: 0 0 14px 14px;
+      background: #0f1117;
+      position: relative;
+    }
+
+    .camera-notch::after {
+      content: "";
+      position: absolute;
+      top: 7px;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      margin-left: -5px;
+      border-radius: 50%;
+      background: #242a34;
+    }
+
+    .screen {
+      margin: 18px 20px 0;
+      border-radius: 22px 22px 0 0;
+      background: linear-gradient(180deg, var(--screen-edge-top), var(--screen-edge-bottom));
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1.1fr);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .divider {
+      background: var(--divider);
+    }
+
+    .pane {
+      min-width: 0;
+      min-height: 0;
+      background: #14171e;
+      position: relative;
+    }
+
+    .panel-pane {
+      background: #171b22;
+    }
+
+    .display-pane {
+      background: #11141a;
+      display: grid;
+      grid-template-rows: 1fr 18px;
+      overflow: hidden;
+    }
+
+    iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #000;
+    }
+
+    .display-stage {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px 14px 0;
+      background: #11141a;
+      overflow: hidden;
+    }
+
+    .display-shell {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: 100%;
+      background: #000;
+      overflow: hidden;
+      align-self: center;
+      justify-self: center;
+    }
+
+    .display-shell iframe {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      transform-origin: top left;
+    }
+
+    .display-toolbar {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      background: #1b1f27;
+    }
+
+    .base {
+      background: #252a33;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #a3acba;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 1200px) {
+      .studio {
+        width: calc(100vw - 16px);
+        height: calc(100vh - 16px);
+        border-radius: 18px;
+        grid-template-rows: 18px 1fr 44px;
+      }
+
+      .camera-notch {
+        width: 160px;
+        height: 18px;
+      }
+
+      .camera-notch::after {
+        top: 5px;
+        width: 8px;
+        height: 8px;
+        margin-left: -4px;
+      }
+
+      .screen {
+        margin: 12px 12px 0;
+        border-radius: 16px 16px 0 0;
+      }
+
+      .display-stage {
+        padding: 12px 10px 0;
+      }
+
+    }
+
+    @media (max-width: 900px) {
+      html,
+      body {
+        overflow: auto;
+      }
+
+      body {
+        display: block;
+        padding: 8px;
+      }
+
+      .studio {
+        width: 100%;
+        height: auto;
+        min-height: calc(100vh - 16px);
+        grid-template-rows: 18px auto 44px;
+      }
+
+      .screen {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(640px, 1fr) 1px minmax(360px, 0.7fr);
+      }
+
+      .divider {
+        width: 100%;
+        height: 1px;
+      }
+
+      .display-pane {
+        grid-template-rows: 1fr 14px;
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <main class="studio">
+    <div class="camera-notch" aria-hidden="true"></div>
+
+    <section class="screen" aria-label="Bible Song Pro preview studio">
+      <div class="pane panel-pane">
+        <iframe
+          id="panel-frame"
+          src="./Bible%20Song%20Pro%20panel.html"
+          title="Bible Song Pro control panel"
+          loading="eager"></iframe>
+      </div>
+
+      <div class="divider" aria-hidden="true"></div>
+
+      <div class="pane display-pane">
+        <div class="display-stage">
+          <div class="display-shell">
+            <iframe
+              id="display-frame"
+              src="./BSP_display.html"
+              title="Bible Song Pro live display"
+              loading="eager"></iframe>
+          </div>
+        </div>
+        <div class="display-toolbar" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <footer class="base">Bible Song Pro Preview</footer>
+  </main>
+
+  <script>
+    const PANEL_URL = "./Bible%20Song%20Pro%20panel.html";
+    const DISPLAY_URL = "./BSP_display.html";
+    const panelFrame = document.getElementById("panel-frame");
+    const displayFrame = document.getElementById("display-frame");
+    const displayShell = document.querySelector(".display-shell");
+    let panelLoaded = false;
+    let displayLoaded = false;
+    let lastPreviewMessage = null;
+    let bridgeInstalled = false;
+
+    function postToDisplay(message) {
+      if (!displayLoaded || !displayFrame.contentWindow || !message) return;
+      try {
+        displayFrame.contentWindow.postMessage(message, "*");
+      } catch (error) {}
+    }
+
+    function rememberAndRelay(message) {
+      lastPreviewMessage = message;
+      postToDisplay(message);
+    }
+
+    function layoutDisplayFrame() {
+      if (!displayShell || !displayFrame) return;
+      const shellWidth = displayShell.clientWidth || 0;
+      const shellHeight = displayShell.clientHeight || 0;
+      if (!shellWidth || !shellHeight) return;
+      const baseWidth = 1920;
+      const baseHeight = 1080;
+      const scale = Math.min(shellWidth / baseWidth, shellHeight / baseHeight);
+      const offsetX = Math.round((shellWidth - (baseWidth * scale)) / 2);
+      const offsetY = Math.round((shellHeight - (baseHeight * scale)) / 2);
+      displayFrame.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+    }
+
+    function handleStatePayload(data) {
+      if (!data || typeof data !== "object") return;
+      if (data.type === "UPDATE") {
+        rememberAndRelay({ type: "PREVIEW_UPDATE", payload: data });
+        return;
+      }
+      if (data.type === "CLEAR") {
+        rememberAndRelay({ type: "PREVIEW_CLEAR" });
+        return;
+      }
+      if (data.type === "SCENE_LAYERS_UPDATE") {
+        rememberAndRelay({ type: "SCENE_LAYERS_UPDATE", sceneLayers: data.sceneLayers });
+        return;
+      }
+      if (data.type === "SYNC_STATE" && data.state) {
+        if (data.state.kind === "update" && data.state.payload) {
+          rememberAndRelay({ type: "PREVIEW_UPDATE", payload: data.state.payload });
+          return;
+        }
+        if (data.state.kind === "clear") {
+          rememberAndRelay({ type: "PREVIEW_CLEAR" });
+        }
+      }
+    }
+
+    function tryPatchPanelPreviewFrame() {
+      try {
+        const panelDoc = panelFrame.contentDocument || panelFrame.contentWindow.document;
+        if (!panelDoc) return false;
+        const previewFrame = panelDoc.getElementById("program-display-frame");
+        if (previewFrame && previewFrame.getAttribute("src") !== DISPLAY_URL) {
+          previewFrame.setAttribute("src", DISPLAY_URL);
+        }
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function installPanelBridge() {
+      if (bridgeInstalled) return true;
+      try {
+        const panelDoc = panelFrame.contentDocument || panelFrame.contentWindow.document;
+        if (!panelDoc || panelDoc.getElementById("bsp-preview-bridge")) return false;
+        const script = panelDoc.createElement("script");
+        script.id = "bsp-preview-bridge";
+        script.textContent = `
+          (function () {
+            if (window.__bspPreviewBridgeInstalled) return;
+            window.__bspPreviewBridgeInstalled = true;
+
+            function emit(message) {
+              try {
+                window.parent.postMessage({ source: "bsp-panel-bridge", message: message }, "*");
+              } catch (e) {}
+            }
+
+            const originalBroadcastMessage = typeof window.broadcastMessage === "function"
+              ? window.broadcastMessage.bind(window)
+              : null;
+
+            if (originalBroadcastMessage) {
+              window.broadcastMessage = function patchedBroadcastMessage(message) {
+                const result = originalBroadcastMessage(message);
+                emit(message);
+                return result;
+              };
+            }
+
+            const originalSendSyncState = typeof window.sendSyncState === "function"
+              ? window.sendSyncState.bind(window)
+              : null;
+
+            if (originalSendSyncState) {
+              window.sendSyncState = function patchedSendSyncState() {
+                const result = originalSendSyncState();
+                try {
+                  const state = window.lastLiveState && window.lastLiveState.kind === "update"
+                    ? { kind: "update", payload: { ...window.lastLiveState.payload, sceneLayers: window.getOutputSceneLayers() } }
+                    : { kind: "clear", sceneLayers: window.getOutputSceneLayers() };
+                  emit({
+                    type: "SYNC_STATE",
+                    proto: 1,
+                    sender: "control",
+                    ts: Date.now(),
+                    seq: typeof window.nextSeq === "function" ? window.nextSeq() : Date.now(),
+                    state
+                  });
+                } catch (e) {}
+                return result;
+              };
+            }
+          })();
+        `;
+        panelDoc.documentElement.appendChild(script);
+        bridgeInstalled = true;
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function waitForPanelInternals() {
+      let attempts = 0;
+      const maxAttempts = 120;
+      const timer = window.setInterval(() => {
+        attempts += 1;
+        const patchedPreview = tryPatchPanelPreviewFrame();
+        const hooked = installPanelBridge();
+        if (patchedPreview || hooked) {
+          window.clearInterval(timer);
+          return;
+        }
+        if (attempts >= maxAttempts) {
+          window.clearInterval(timer);
+        }
+      }, 250);
+    }
+
+    panelFrame.addEventListener("load", () => {
+      panelLoaded = true;
+      waitForPanelInternals();
+    });
+
+    displayFrame.addEventListener("load", () => {
+      displayLoaded = true;
+      layoutDisplayFrame();
+      if (lastPreviewMessage) postToDisplay(lastPreviewMessage);
+    });
+
+    window.addEventListener("message", (event) => {
+      const data = event.data || {};
+      if ((data.source === "bsp-panel-parent" || data.source === "bsp-panel-bridge") && data.message) {
+        handleStatePayload(data.message);
+      }
+    });
+
+    if (panelFrame.getAttribute("src") !== PANEL_URL) {
+      panelFrame.setAttribute("src", PANEL_URL);
+    }
+
+    window.addEventListener("resize", layoutDisplayFrame);
+    requestAnimationFrame(layoutDisplayFrame);
+  </script>
+</body>
+</html>

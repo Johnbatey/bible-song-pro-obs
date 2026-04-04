@@ -1,0 +1,11 @@
+name = "bible-song-pro-feedback"
+main = "src/index.js"
+compatibility_date = "2025-03-01"
+
+[vars]
+GITHUB_REPO = "Johnbatey/bible-song-pro-obs"
+ALLOWED_ORIGINS = ""
+ALLOW_NULL_ORIGIN = "true"
+
+# Set secrets with:
+# wrangler secret put GITHUB_TOKEN

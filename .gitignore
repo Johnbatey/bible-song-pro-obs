@@ -1,0 +1,11 @@
+.DS_Store
+
+node_modules/
+dist/
+
+.qodo/
+
+*.log
+*.tmp
+
+electron/resources/win-iconset/

@@ -1,0 +1,3230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bible Song Pro - Display</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Noto fonts: improve Arabic and CJK coverage -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+    
+    @font-face {
+      font-family: 'CustomFont';
+      src: url('') format('truetype');
+    }
+    
+    @font-face {
+      font-family: 'CMGSans';
+      src: local('Arial'), local('Helvetica');
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    #bg-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -3;
+      overflow: hidden;
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: black;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0;
+    }
+
+    /* Crossfade overlay for full-mode BG dissolves */
+    #bg-layer-crossfade {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: -2;
+      overflow: hidden;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .bg-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateZ(0);
+    }
+
+    .bg-youtube {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      display: none;
+      pointer-events: none;
+      transform: translateZ(0);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .bg-youtube iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 0;
+    }
+
+    #lt-bg-wrap {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      z-index: -2;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                  height 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                  bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                  top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: linear-gradient(to top, 
+                  rgba(0, 0, 0, 1) 0%, 
+                  rgba(0, 0, 0, 0.85) 15%, 
+                  rgba(0, 0, 0, 0.7) 30%, 
+                  rgba(0, 0, 0, 0.5) 50%, 
+                  rgba(0, 0, 0, 0.3) 70%, 
+                  rgba(0, 0, 0, 0.1) 85%, 
+                  rgba(0, 0, 0, 0) 100%);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    #lt-bg-inner {
+      position: absolute;
+      inset: 0;
+      background-color: black;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: filter 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                  transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), 
+                  background-color 0.2s ease;
+    }
+
+    /* Crossfade overlay for LT-mode BG dissolves */
+    #lt-bg-crossfade {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #display-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #text-container {
+      color: white;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+      max-width: 100%;
+      width: 100%;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                  transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                  color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+      text-align: center;
+      box-sizing: border-box;
+      line-height: 1.2;
+      position: absolute;
+      z-index: 4;
+      will-change: transform, opacity;
+    }
+
+
+    #custom-lt-ref-box {
+      position: absolute;
+      display: none;
+      background: #00411C;
+      opacity: 0.95;
+      border: 2px solid white;
+      border-radius: 10px;
+      box-shadow: 15px 11px 16px 0px rgba(0, 0, 0, 0.5);
+      z-index: 3;
+      align-items: center;
+      justify-content: center;
+      font-family: 'CMGSans', 'Montserrat', sans-serif;
+      font-weight: bold;
+      font-size: 36px;
+      color: white;
+      text-align: center;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                  top 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                  opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      padding: 12px 24px;
+      min-width: 200px;
+      pointer-events: none;
+    }
+
+    #custom-lt-version-bar {
+      position: absolute;
+      display: none;
+      background: #1a1a2e;
+      opacity: 0.95;
+      border: 1px solid white;
+      border-radius: 8px;
+      z-index: 3;
+      align-items: center;
+      justify-content: center;
+      font-family: 'CMGSans', 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 24px;
+      color: white;
+      text-align: center;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  top 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 8px 12px;
+      min-width: 120px;
+      pointer-events: none;
+    }
+
+    #custom-lt-main-bar {
+      position: absolute;
+      display: none;
+      width: 100%;
+      background: linear-gradient(90deg, 
+                  rgba(0, 94, 41, 0.95) 0%, 
+                  rgba(23, 142, 76, 0.95) 100%);
+      z-index: 2;
+      align-items: center;
+      font-family: 'CMGSans', 'Montserrat', sans-serif;
+      font-weight: bold;
+      font-size: 40px;
+      color: white;
+      text-shadow: 2px 2px 4px #000000;
+      text-align: left;
+      padding: 20px 0 20px 60px;
+      box-sizing: border-box;
+      min-height: 220px;
+      transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                  top 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                  left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                  padding 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                  opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    /* Bible/Song Specific Styling */
+    .lt-bible #text-container {
+      text-align: left;
+    }
+    
+    .lt-song #text-container {
+      text-align: center;
+    }
+
+    /* Verse Styling */
+    .jo-body {
+      display: block;
+      transition: all 0.3s ease;
+    }
+    
+    .dual-primary-block {
+      display: block;
+    }
+
+    .dual-secondary-wrapper {
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .dual-secondary-wrapper .jo-ref-line {
+      margin-bottom: 2px !important;
+      opacity: 0.85;
+    }
+
+    .dual-secondary-body {
+      opacity: 0.9;
+      font-size: 0.95em;
+    }
+    
+    .jo-highlight {
+      display: block;
+      margin: 0 0 0.35em;
+      padding: 0.18em 0.4em;
+      line-height: 1.35;
+      border-radius: 10px;
+      box-decoration-break: clone;
+      background: var(--highlight-color, rgba(255, 235, 150, 0.95));
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+      word-break: break-word;
+    }
+
+    .jo-ref-line {
+      margin-bottom: 10px !important;
+      font-weight: 800 !important;
+      font-size: 0.8em !important;
+      opacity: 0.9;
+      transition: all 0.3s ease;
+    }
+
+    /* Ensure Bible reference lines use the preferred font (default Montserrat) */
+    .lt-bible .jo-ref-line {
+      font-family: 'Montserrat', sans-serif !important;
+    }
+    
+    .jo-ref-tail {
+      margin-top: 20px !important;
+    }
+    
+    .jo-verse-sup {
+      font-size: 0.5em !important;
+      vertical-align: super !important;
+      margin-right: 4px !important;
+      line-height: 0 !important;
+      background: rgba(56, 189, 248, 0.2);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-weight: 700;
+      color: #e0f2fe;
+    }
+
+    /* Bible LT Mode Specific */
+    .lt-bible.mode-lt #text-container {
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+    }
+    
+    .lt-bible.mode-lt #lt-bg-wrap {
+      bottom: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 1;
+    }
+    
+    .lt-bible.mode-lt #lt-bg-inner {
+      transform-origin: center bottom;
+    }
+    
+    .lt-bible.mode-lt .jo-body {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: left;
+      padding-left: clamp(24px, 2vw, 40px);
+      padding-right: clamp(24px, 2vw, 40px);
+    }
+    
+    .lt-bible.mode-lt .jo-ref-line {
+      position: relative;
+      z-index: 4;
+      background: transparent;
+      padding: 8px 16px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      margin-left: 0;
+      align-self: flex-start;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Custom Mode Bible */
+    .lt-bible.mode-custom #custom-lt-main-bar {
+      display: flex;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      min-height: 120px;
+      padding: 25px 15px 25px 60px;
+      align-items: center;
+    }
+    
+    .lt-bible.mode-custom #text-container {
+      display: block !important;
+      position: absolute !important;
+      left: 60px !important;
+      right: 60px !important;
+      bottom: 25px !important;
+      top: auto !important;
+      z-index: 3 !important;
+      opacity: 1 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      text-align: left !important;
+    }
+    
+    .lt-bible.mode-custom #custom-lt-ref-box {
+      display: flex;
+      bottom: calc(100% + 10px);
+      left: 60px;
+      z-index: 4;
+      min-width: 240px;
+    }
+    
+    .lt-bible.mode-custom .jo-body {
+      padding-left: 0 !important;
+      width: 100%;
+    }
+
+    /* Song LT Mode */
+    .lt-song.mode-lt #text-container {
+      text-align: center;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px 10%;
+      box-sizing: border-box;
+    }
+    
+    .lt-song.mode-lt #lt-bg-wrap {
+      bottom: 0;
+      opacity: 1;
+    }
+    
+    .lt-song.mode-lt .jo-body {
+      text-align: center;
+      width: 100%;
+    }
+
+    /* Full Screen Mode */
+    .mode-full #text-container {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 1;
+      padding: 0 20px;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+    }
+    
+    .mode-full .jo-body {
+      text-align: center;
+      width: 100%;
+    }
+    
+    .mode-full .jo-ref-line {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 0.7em;
+      opacity: 0.9;
+    }
+
+    /* Animation Classes */
+    .transition-anim {
+      animation-fill-mode: both;
+      animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: opacity, transform, clip-path;
+    }
+    
+    .anim-fade { animation-name: fadeIn; }
+    .anim-zoom { animation-name: zoomIn; }
+    .anim-write { animation-name: writeOn; }
+    
+    .type-line {
+      display: block;
+    }
+    
+    .type-word {
+      display: inline-block;
+      white-space: pre;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    
+    .hidden-word {
+      visibility: hidden;
+      opacity: 0;
+    }
+    
+    .revealed-word {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .custom-main-text,
+    .custom-ref-text,
+    .custom-version-text {
+      display: block;
+      width: 100%;
+    }
+
+    .text-anim-content {
+      display: block;
+      width: 100%;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes zoomIn {
+      from { 
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to { 
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    @keyframes writeOn {
+      from { 
+        opacity: 0;
+        clip-path: inset(0 100% 0 0);
+      }
+      to { 
+        opacity: 1;
+        clip-path: inset(0 0 0 0);
+      }
+    }
+    
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes scaleIn {
+      from { 
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to { 
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 1920px) {
+      #custom-lt-ref-box {
+        font-size: 28px;
+        padding: 10px 20px;
+        min-width: 180px;
+      }
+      
+      #custom-lt-main-bar {
+        font-size: 32px;
+        min-height: 180px;
+        padding: 15px 0 15px 40px;
+      }
+      
+      .lt-bible.mode-lt #text-container {
+        padding: 15px 40px;
+      }
+      
+      .lt-bible.mode-custom #text-container {
+        left: 40px !important;
+        right: 40px !important;
+        bottom: 20px !important;
+      }
+      
+      .lt-bible.mode-custom #custom-lt-main-bar {
+        padding: 20px 10px 20px 40px;
+        min-height: 100px;
+      }
+      
+      .lt-bible.mode-custom #custom-lt-ref-box {
+        left: 40px;
+      }
+    }
+
+    /* High DPI Screens */
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+      #text-container {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+      }
+      
+      .jo-verse-sup {
+        -webkit-font-smoothing: subpixel-antialiased;
+      }
+    }
+
+    /* Performance Optimizations */
+    .hardware-accelerated {
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      perspective: 1000px;
+    }
+  </style>
+</head>
+<body>
+  <div id="bg-layer" class="hardware-accelerated">
+    <video id="bg-video" class="bg-video" muted playsinline loop></video>
+    <div id="bg-youtube" class="bg-youtube">
+      <iframe id="bg-youtube-frame" title="Background YouTube" allow="autoplay; encrypted-media; fullscreen; picture-in-picture"></iframe>
+    </div>
+  </div>
+  <div id="bg-layer-crossfade"></div>
+  <div id="lt-bg-wrap" class="hardware-accelerated">
+    <div id="lt-bg-inner" class="hardware-accelerated">
+      <video id="lt-bg-video" class="bg-video" muted playsinline loop></video>
+      <div id="lt-bg-youtube" class="bg-youtube">
+        <iframe id="lt-bg-youtube-frame" title="Lower Third YouTube" allow="autoplay; encrypted-media; fullscreen; picture-in-picture"></iframe>
+      </div>
+    </div>
+    <div id="lt-bg-crossfade"></div>
+  </div>
+  <div id="custom-lt-ref-box" class="hardware-accelerated"></div>
+  <div id="custom-lt-version-bar" class="hardware-accelerated"></div>
+  <div id="custom-lt-main-bar" class="hardware-accelerated"></div>
+  <div id="display-container" class="mode-full">
+    <div id="text-container" class="hardware-accelerated"></div>
+  </div>
+
+  <div id="debug-overlay" style="position: fixed; right: 12px; top: 12px; background: rgba(0,0,0,0.7); color: #fff; padding: 10px; border-radius: 8px; z-index: 9999; font-family: monospace; font-size: 12px; max-width: 440px; max-height: 60vh; overflow:auto; display: none;">
+    <div id="debug-status" style="font-weight:bold;margin-bottom:6px">DEBUG: initializing...</div>
+    <div id="debug-logs"></div>
+  </div>
+
+  <script>
+    'use strict';
+
+    // ===== CONSTANTS / GLOBALS =====
+    const CHANNEL_NAME = 'bible_song_pro_v1';
+    const RELAY_DEFAULT_PORT = 5511;
+    const SYNC_MIRROR_DB_NAME = 'bible-song-pro-sync';
+    const SYNC_MIRROR_DB_VERSION = 1;
+    const SYNC_MIRROR_STORE = 'messages';
+    const SYNC_MIRROR_LAST_KEY = 'last';
+    const channel = (typeof BroadcastChannel === 'function') ? new BroadcastChannel(CHANNEL_NAME) : null;
+    const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+    const typeAnim = { textKey: null, startTime: 0, duration: 0, rafId: null, words: [] };
+    const transitionState = { textKey: null, type: null, startTime: 0, duration: 0 };
+    let clearTimer = null;
+    let clearToken = 0;
+    let bgActivePrev = false;
+    let ltBgActivePrev = false;
+    let customBgActivePrev = false;
+    let prevBgState = { full: false, lt: false, custom: false };
+    let animateBgTransitions = true;
+    let hasSynced = false;
+    let helloTimer = null;
+    const loadedFonts = new Set();
+    // Track which Google font families we have injected
+    const loadedGoogleFonts = new Set();
+    let relaySocket = null;
+    let relayUrl = '';
+    let relayReconnectTimer = null;
+    let relayBackoff = 1500;
+    let syncMirrorDbPromise = null;
+    let syncMirrorPollTimer = null;
+    let lastMirrorSeq = 0;
+
+    // ===== TYPOGRAPHY =====
+    function loadGoogleFontIfNeeded(family) {
+      if (!family) return;
+      try {
+        if (loadedGoogleFonts.has(family)) return;
+        // family may include weight spec like 'Noto Sans Devanagari:wght@400;700'
+        const familyParam = String(family).replace(/\s+/g, '+');
+        const href = `https://fonts.googleapis.com/css2?family=${familyParam}&display=swap`;
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        document.head.appendChild(link);
+        loadedGoogleFonts.add(family);
+        debug('Loading Google font: ' + family);
+      } catch (e) {
+        console.error('Failed to load Google font', family, e);
+      }
+    }
+
+    // Map a selected font-family string to a Google Fonts family identifier (if applicable)
+    function mapFontFamilyToGoogle(fontFamilyString) {
+      if (!fontFamilyString) return null;
+      const f = String(fontFamilyString).toLowerCase();
+      if (f.includes('noto sans devanagari')) return 'Noto Sans Devanagari:wght@400;700';
+      if (f.includes('noto sans bengali')) return 'Noto Sans Bengali:wght@400;700';
+      if (f.includes('noto sans gurmukhi') || f.includes('gurmukhi')) return 'Noto Sans Gurmukhi:wght@400;700';
+      if (f.includes('noto sans gujarati')) return 'Noto Sans Gujarati:wght@400;700';
+      if (f.includes('noto sans tamil')) return 'Noto Sans Tamil:wght@400;700';
+      if (f.includes('noto sans telugu')) return 'Noto Sans Telugu:wght@400;700';
+      if (f.includes('noto sans kannada')) return 'Noto Sans Kannada:wght@400;700';
+      if (f.includes('noto sans malayalam')) return 'Noto Sans Malayalam:wght@400;700';
+      if (f.includes('noto sans sinhala')) return 'Noto Sans Sinhala:wght@400;700';
+      if (f.includes('noto sans myanmar')) return 'Noto Sans Myanmar:wght@400;700';
+      if (f.includes('noto sans ethiopic')) return 'Noto Sans Ethiopic:wght@400;700';
+      if (f.includes('noto sans thai')) return 'Noto Sans Thai:wght@400;700';
+      if (f.includes('noto sans lao')) return 'Noto Sans Lao:wght@400;700';
+      if (f.includes('noto sans khmer')) return 'Noto Sans Khmer:wght@400;700';
+      if (f.includes('noto sans arabic')) return 'Noto Sans Arabic:wght@400;700';
+      if (f.includes('noto sans hebrew')) return 'Noto Sans Hebrew:wght@400;700';
+      if (f.includes('montserrat')) return 'Montserrat:wght@400;500;600;700;800;900';
+      if (f.includes('noto sans sc')) return 'Noto Sans SC:wght@400;700';
+      if (f.includes('noto sans tc')) return 'Noto Sans TC:wght@400;700';
+      if (f.includes('noto sans jp')) return 'Noto Sans JP:wght@400;700';
+      if (f.includes('noto sans kr')) return 'Noto Sans KR:wght@400;700';
+      if (f.includes('noto sans')) return 'Noto Sans:wght@400;700';
+      if (f.includes('noto serif')) return 'Noto Serif:wght@400;700';
+      return null;
+    }
+    // Remember last song LT layout so we can preserve visual position when BG is toggled off
+    let lastSongLtLayout = {
+      visualBottom: null, // px from viewport bottom to content bottom
+      visualTop: null,    // px from viewport top to content top
+      visualBottomNorm: null,
+      visualTopNorm: null,
+      padTopPx: null,
+      padBottomPx: null,
+      sidePad: null,      // e.g. "10%"
+      heightVh: null,
+      anchor: 'bottom'
+    };
+    
+    // Current display state
+    let currentState = {
+      mode: 'full',
+      isBible: false,
+      text: '',
+      styleData: null,
+      isLive: false
+    };
+    
+    // Performance optimization
+    let rafId = null;
+    let lastUpdateTime = 0;
+    let lastSeq = 0;
+    let lastLtBgMode = 'solid';
+    let lastBGMode = 'solid';
+    let lastBgType = 'color';
+    let lastLtBgType = 'color';
+    // Store last background styles for crossfade dissolves
+    let lastFullBgStyle = { backgroundImage: 'none', backgroundColor: 'black' };
+    let lastLtBgStyle = { backgroundImage: 'none', backgroundColor: 'black' };
+    const UPDATE_THROTTLE = 16; // ~60fps
+    const MIN_SONG_LT_NO_BG_BOTTOM_PAD_PX = 40;
+    const MIN_SONG_LT_NO_BG_TOP_PAD_PX = 24;
+    // Debug mode controlled by URL param `?debug=1` or `?debug`
+    const DEBUG_MODE = new URLSearchParams(window.location.search).has('debug');
+    
+    // DOM Elements
+    const elements = {
+      txt: document.getElementById('text-container'),
+      bg: document.getElementById('bg-layer'),
+      bgCrossfade: document.getElementById('bg-layer-crossfade'),
+      bgVideo: document.getElementById('bg-video'),
+      bgYoutube: document.getElementById('bg-youtube'),
+      bgYoutubeFrame: document.getElementById('bg-youtube-frame'),
+      cont: document.getElementById('display-container'),
+      ltWrap: document.getElementById('lt-bg-wrap'),
+      ltInner: document.getElementById('lt-bg-inner'),
+      ltCrossfade: document.getElementById('lt-bg-crossfade'),
+      ltVideo: document.getElementById('lt-bg-video'),
+      ltYoutube: document.getElementById('lt-bg-youtube'),
+      ltYoutubeFrame: document.getElementById('lt-bg-youtube-frame'),
+      customRefBox: document.getElementById('custom-lt-ref-box'),
+      customVersionBar: document.getElementById('custom-lt-version-bar'),
+      customMainBar: document.getElementById('custom-lt-main-bar'),
+      customMainText: null,
+      customRefText: null,
+      customVersionText: null
+    };
+
+    // Simple on-screen debug logger (temporary)
+    function debug(msg, isError = false) {
+      try {
+        // Always log to console
+        console[isError ? 'error' : 'log']('[DISPLAY DEBUG]', msg);
+
+        // Only update the on-screen overlay when in debug mode
+        if (!DEBUG_MODE) return;
+
+        const logs = document.getElementById('debug-logs');
+        const status = document.getElementById('debug-status');
+        if (logs) {
+          const el = document.createElement('div');
+          el.style.whiteSpace = 'pre-wrap';
+          el.style.marginBottom = '6px';
+          el.textContent = (new Date()).toLocaleTimeString() + ' — ' + String(msg);
+          if (isError) el.style.color = '#ff8080';
+          logs.prepend(el);
+        }
+        if (status && !isError) status.innerText = String(msg).split('\n')[0];
+        if (isError && status) status.innerText = 'Error — see logs';
+      } catch (e) {
+        console.error('debug helper failed', e);
+      }
+    }
+
+    function openSyncMirrorDb() {
+      if (syncMirrorDbPromise) return syncMirrorDbPromise;
+      syncMirrorDbPromise = new Promise((resolve, reject) => {
+        try {
+          const req = indexedDB.open(SYNC_MIRROR_DB_NAME, SYNC_MIRROR_DB_VERSION);
+          req.onupgradeneeded = () => {
+            const db = req.result;
+            if (!db.objectStoreNames.contains(SYNC_MIRROR_STORE)) {
+              db.createObjectStore(SYNC_MIRROR_STORE);
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error || new Error('Failed to open sync mirror DB'));
+        } catch (err) {
+          reject(err);
+        }
+      }).catch(err => {
+        syncMirrorDbPromise = null;
+        return Promise.reject(err);
+      });
+      return syncMirrorDbPromise;
+    }
+
+    function readMirrorMessage() {
+      return openSyncMirrorDb().then(db => new Promise((resolve, reject) => {
+        try {
+          const tx = db.transaction(SYNC_MIRROR_STORE, 'readonly');
+          const req = tx.objectStore(SYNC_MIRROR_STORE).get(SYNC_MIRROR_LAST_KEY);
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => reject(req.error || new Error('Failed to read sync mirror message'));
+        } catch (err) {
+          reject(err);
+        }
+      })).catch(() => null);
+    }
+
+    function syncFromMirror(force = false) {
+      readMirrorMessage().then(record => {
+        if (!record || !record.msg) return;
+        const seq = Number(record.seq || (record.msg && record.msg.seq) || 0);
+        if (!force && seq && seq <= lastMirrorSeq) return;
+        lastMirrorSeq = Math.max(lastMirrorSeq, seq);
+        handleInboundMessage(record.msg, 'idb');
+      }).catch(() => {});
+    }
+
+    function startMirrorPolling() {
+      if (syncMirrorPollTimer) return;
+      syncMirrorPollTimer = setInterval(() => {
+        syncFromMirror(false);
+      }, 800);
+    }
+    
+    // ===== SYNC (BroadcastChannel) =====
+    // Initialize
+    function init() {
+      // Set up CSS custom properties for smooth transitions
+      document.documentElement.style.setProperty('--transition-timing', 'cubic-bezier(0.4, 0, 0.2, 1)');
+      
+      // Set initial opacity to 0 for fade-in effect
+      elements.txt.style.opacity = '0';
+      elements.bg.style.opacity = '0';
+      elements.ltWrap.style.opacity = '0';
+      
+      // Reveal debug overlay and report init
+      const dbg = document.getElementById('debug-overlay');
+      if (dbg) dbg.style.display = DEBUG_MODE ? 'block' : 'none';
+      if (DEBUG_MODE) debug('init: initialized (overlay visible)');
+      else console.log('init: debug overlay hidden');
+
+      // Send initial ping + state request
+      if (channel) channel.postMessage({ type: 'PONG' });
+      if (channel) channel.postMessage({ type: 'HELLO', proto: 1, sender: 'display', ts: Date.now() });
+      connectRelay();
+      syncFromMirror(true);
+      startMirrorPolling();
+      if (helloTimer) clearInterval(helloTimer);
+      helloTimer = setInterval(() => {
+        if (hasSynced) {
+          clearInterval(helloTimer);
+          helloTimer = null;
+          return;
+        }
+        if (channel) channel.postMessage({ type: 'HELLO', proto: 1, sender: 'display', ts: Date.now() });
+        relaySend({ type: 'HELLO', proto: 1, sender: 'display', ts: Date.now() });
+        syncFromMirror(false);
+      }, 2000);
+      
+      // Self-test: only run in debug mode
+      if (DEBUG_MODE) {
+        setTimeout(() => {
+          debug('Self-test: drawing sample text');
+          try {
+            handleUpdate({ text: 'Self-test: display rendering OK', mode: 'full', isBible: false, fontSizeFull: 80, fontSizeLT: 36, lineHeightFull: 1.1, lineHeightLT: 1.1, transitionType: 'fade', transitionDuration: 0.3 });
+          } catch (e) { debug('Self-test error: ' + (e && e.message ? e.message : String(e)), true); }
+        }, 1200);
+      }
+
+      console.log('Bible Song Pro Display initialized');
+    }
+    
+    // Handle incoming messages
+    function acceptSeq(seq) {
+      if (!seq) return true;
+      if (seq <= lastSeq) return false;
+      lastSeq = seq;
+      return true;
+    }
+
+    function applyUpdateWithThrottle(data) {
+      const now = performance.now();
+      if (now - lastUpdateTime < UPDATE_THROTTLE) {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => handleUpdate(data));
+      } else {
+        handleUpdate(data);
+        lastUpdateTime = now;
+      }
+    }
+
+    function relaySend(msg) {
+      if (!relaySocket || relaySocket.readyState !== WebSocket.OPEN) return;
+      try { relaySocket.send(JSON.stringify(msg)); } catch (e) {}
+    }
+
+    function buildRelayUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const override = params.get('relay');
+      if (override) return override;
+      const protocol = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
+      let host = window.location.hostname || '';
+      if (!host || host === 'localhost') host = '127.0.0.1';
+      const port = params.get('relayPort') || RELAY_DEFAULT_PORT;
+      if (!host || !port) return '';
+      return `${protocol}//${host}:${port}`;
+    }
+
+    function disconnectRelay() {
+      if (relayReconnectTimer) {
+        clearTimeout(relayReconnectTimer);
+        relayReconnectTimer = null;
+      }
+      if (relaySocket) {
+        try { relaySocket.close(); } catch (e) {}
+      }
+      relaySocket = null;
+    }
+
+    function scheduleRelayReconnect() {
+      if (relayReconnectTimer) return;
+      relayReconnectTimer = setTimeout(() => {
+        relayReconnectTimer = null;
+        connectRelay();
+      }, relayBackoff);
+      relayBackoff = Math.min(relayBackoff * 1.5, 15000);
+    }
+
+    function connectRelay() {
+      const url = buildRelayUrl();
+      if (!url) return;
+      if (relaySocket && relayUrl === url && (relaySocket.readyState === WebSocket.OPEN || relaySocket.readyState === WebSocket.CONNECTING)) return;
+      disconnectRelay();
+      relayUrl = url;
+      try {
+        relaySocket = new WebSocket(url);
+      } catch (e) {
+        scheduleRelayReconnect();
+        return;
+      }
+      relaySocket.onopen = () => {
+        relayBackoff = 1500;
+        relaySend({ type: 'HELLO', proto: 1, sender: 'display', ts: Date.now() });
+      };
+      relaySocket.onclose = () => {
+        scheduleRelayReconnect();
+      };
+      relaySocket.onerror = () => {};
+      relaySocket.onmessage = (event) => {
+        let data = null;
+        try { data = JSON.parse(event.data); } catch (e) { return; }
+        handleInboundMessage(data, 'relay');
+      };
+    }
+
+    function handleInboundMessage(d, source) {
+      debug(`MSG(${source}): ` + (d.type || 'unknown') + (d.text ? ' — ' + (String(d.text).slice(0,80)) : ''));
+      try {
+        switch (d.type) {
+          case 'PING': {
+            const pong = { type: 'PONG' };
+            if (source === 'relay') relaySend(pong);
+            else if (channel) channel.postMessage(pong);
+            break;
+          }
+          case 'CLEAR':
+            hasSynced = true;
+            if (acceptSeq(d.seq)) clearDisplay({ fade: d.fade !== false, duration: d.transitionDuration });
+            break;
+          case 'UPDATE':
+            hasSynced = true;
+            if (!acceptSeq(d.seq)) return;
+            applyUpdateWithThrottle(d);
+            break;
+          case 'SYNC_STATE': {
+            const state = d.state || {};
+            const payload = state.payload || null;
+            const seq = payload && payload.seq ? payload.seq : d.seq;
+            hasSynced = true;
+            if (!acceptSeq(seq)) return;
+            if (state.kind === 'clear') {
+              clearDisplay();
+            } else if (state.kind === 'update' && payload) {
+              applyUpdateWithThrottle(payload);
+            }
+            break;
+          }
+        }
+      } catch (err) {
+        debug('Exception in message handler: ' + (err && err.message ? err.message : String(err)), true);
+        console.error(err);
+      }
+    }
+
+    if (channel) {
+      channel.onmessage = (e) => {
+        handleInboundMessage(e.data || {}, 'bc');
+      };
+    }
+    
+    function computeLtHeight(d) {
+      let ltHeight = Number(d.ltBgHeightPct || 20);
+      if (d.autoAdjustLtHeight) {
+        const lineCount = d.lineCount || d.verseCount || 2;
+        const extraPerLine = d.isBible ? 4 : 2.5;
+        ltHeight = ltHeight + Math.max(0, (lineCount - 2) * extraPerLine);
+      }
+      return clamp(ltHeight, d.isBible ? 12 : 10, d.isBible ? 50 : 40);
+    }
+
+    function getLtAnchorMode(d) {
+      return (d && d.ltAnchorMode === 'top') ? 'top' : 'bottom';
+    }
+
+    function getLtOffsetY(d) {
+      return Math.max(-1200, Math.min(1200, Number(d && d.ltOffsetY) || 0));
+    }
+
+    function getLtOffsetX(d) {
+      return Math.max(-1200, Math.min(1200, Number(d && d.ltOffsetX) || 0));
+    }
+
+    function getLtBorderRadius(d) {
+      return Math.max(0, Math.min(240, Number(d && d.ltBorderRadius) || 0));
+    }
+
+    function getLtScaleFactor(d) {
+      return Math.max(0, Math.min(100, Number(d && d.ltScalePct) || 100)) / 100;
+    }
+
+    function getLtWrapTransform(d) {
+      const rawOffsetX = getLtOffsetX(d);
+      const rawOffset = getLtOffsetY(d);
+      const isTop = getLtAnchorMode(d) === 'top';
+      const translateY = isTop ? rawOffset : -rawOffset;
+      const scale = getLtScaleFactor(d);
+      return `translate(calc(-50% + ${rawOffsetX}px), ${translateY}px) scale(${scale})`;
+    }
+
+    function getLtTextTransform(d) {
+      const rawOffsetX = getLtOffsetX(d);
+      const rawOffset = getLtOffsetY(d);
+      const isTop = getLtAnchorMode(d) === 'top';
+      const translateY = isTop ? rawOffset : -rawOffset;
+      const scale = getLtScaleFactor(d);
+      return `translate(${rawOffsetX}px, ${translateY}px) scale(${scale})`;
+    }
+
+    function applyLtContentWidth(d) {
+      const pct = Math.max(50, Math.min(100, Number(d && d.ltWidthPct) || 100));
+      elements.txt.style.width = `${pct}%`;
+      elements.txt.style.maxWidth = `${pct}%`;
+      elements.txt.style.marginLeft = 'auto';
+      elements.txt.style.marginRight = 'auto';
+      elements.ltWrap.style.left = '50%';
+      elements.ltWrap.style.right = 'auto';
+      elements.ltWrap.style.transform = getLtWrapTransform(d);
+      elements.ltWrap.style.width = `${pct}%`;
+      elements.ltWrap.style.maxWidth = `${pct}%`;
+      elements.ltInner.style.width = '100%';
+      elements.ltInner.style.maxWidth = '100%';
+      elements.ltCrossfade.style.width = '100%';
+      elements.ltCrossfade.style.maxWidth = '100%';
+    }
+
+    function applyLtBandOffset(d) {
+      elements.ltWrap.style.transform = getLtWrapTransform(d);
+    }
+
+    function applyLtBorderRadius(d) {
+      const radius = getLtBorderRadius(d);
+      const radiusPx = `${radius}px`;
+      elements.ltWrap.style.borderRadius = radiusPx;
+      elements.ltInner.style.borderRadius = radiusPx;
+      elements.ltCrossfade.style.borderRadius = radiusPx;
+    }
+
+    function applyLtTextOffset(d) {
+      elements.txt.style.transform = getLtTextTransform(d);
+    }
+
+    function applySongLtVerticalLayout(d, ltHeight, sidePad, vAlignLT, anchorMode) {
+      const isTopAnchor = anchorMode === 'top';
+      const requestedHeightPx = (ltHeight / 100) * window.innerHeight;
+      elements.txt.style.top = isTopAnchor ? '0' : 'auto';
+      elements.txt.style.bottom = isTopAnchor ? 'auto' : '0';
+      elements.txt.style.paddingLeft = sidePad;
+      elements.txt.style.paddingRight = sidePad;
+      elements.txt.style.paddingTop = '0px';
+      elements.txt.style.paddingBottom = '0px';
+      elements.txt.style.height = 'auto';
+      elements.txt.style.overflow = 'visible';
+
+      const txtHeight = elements.txt.scrollHeight || elements.txt.getBoundingClientRect().height || 0;
+      const edgePadPx = Math.max(14, Math.round(0.016 * window.innerHeight));
+      const fittedHeightPx = Math.max(txtHeight + (edgePadPx * 2), 64);
+      const actualHeightPx = d.autoAdjustLtHeight ? Math.min(requestedHeightPx, fittedHeightPx) : requestedHeightPx;
+      const actualHeightVh = (actualHeightPx / window.innerHeight) * 100;
+
+      elements.ltWrap.style.height = `${actualHeightVh}vh`;
+      elements.txt.style.height = `${actualHeightVh}vh`;
+      elements.txt.style.overflow = 'hidden';
+
+      let topPad = edgePadPx;
+      let bottomPad = edgePadPx;
+      let justifyContent = 'center';
+
+      if (vAlignLT === 'top') {
+        justifyContent = 'flex-start';
+      } else if (vAlignLT === 'bottom') {
+        justifyContent = 'flex-end';
+      } else {
+        const available = Math.max(0, actualHeightPx - (edgePadPx * 2));
+        if (txtHeight <= available) {
+          const extra = available - txtHeight;
+          topPad = edgePadPx + Math.floor(extra / 2);
+          bottomPad = edgePadPx + Math.ceil(extra / 2);
+        }
+      }
+
+      elements.txt.style.paddingTop = `${topPad}px`;
+      elements.txt.style.paddingBottom = `${bottomPad}px`;
+      elements.txt.style.justifyContent = justifyContent;
+
+      lastSongLtLayout.padTopPx = topPad;
+      lastSongLtLayout.padBottomPx = bottomPad;
+      lastSongLtLayout.sidePad = sidePad;
+      lastSongLtLayout.heightVh = actualHeightVh;
+      lastSongLtLayout.anchor = anchorMode;
+
+      const textRect = elements.txt.getBoundingClientRect();
+      lastSongLtLayout.visualTop = Math.round(textRect.top || 0);
+      lastSongLtLayout.visualBottom = Math.round(window.innerHeight - (textRect.bottom || 0));
+      lastSongLtLayout.padTopNorm = actualHeightPx > 0 ? (topPad / actualHeightPx) : null;
+      lastSongLtLayout.padBottomNorm = actualHeightPx > 0 ? (bottomPad / actualHeightPx) : null;
+      lastSongLtLayout.visualTopNorm = (lastSongLtLayout.visualTop != null) ? (lastSongLtLayout.visualTop / window.innerHeight) : null;
+      lastSongLtLayout.visualBottomNorm = (lastSongLtLayout.visualBottom != null) ? (lastSongLtLayout.visualBottom / window.innerHeight) : null;
+    }
+
+    function applyBibleLtLayout(d, ltHeight, anchorMode) {
+      const isTopAnchor = anchorMode === 'top';
+      const padLR = Math.max(0, d.padLRLT ?? d.padLR ?? 0);
+      const bodyInset = 'clamp(24px, 2vw, 40px)';
+      const hAlignLT = d.hAlignLTBible || 'left';
+      const vAlignLT = d.vAlignLTBible || 'middle';
+      const verseAlign = d.hAlignLTBibleVerse || hAlignLT;
+
+      elements.txt.style.height = `${ltHeight}vh`;
+      elements.txt.style.overflow = 'hidden';
+      elements.txt.style.top = isTopAnchor ? '0' : 'auto';
+      elements.txt.style.bottom = isTopAnchor ? 'auto' : '0';
+      elements.txt.style.padding = isTopAnchor ? `2vh ${padLR}% 0` : `0 ${padLR}% 2vh`;
+      elements.txt.style.textAlign = (hAlignLT === 'justify') ? 'justify' : hAlignLT;
+      elements.txt.style.alignItems = (hAlignLT === 'left') ? 'flex-start' : (hAlignLT === 'right') ? 'flex-end' : (hAlignLT === 'justify' ? 'stretch' : 'center');
+      elements.txt.style.justifyContent = (vAlignLT === 'top') ? 'flex-start' : (vAlignLT === 'bottom' ? 'flex-end' : 'center');
+
+      const refEls = elements.txt.querySelectorAll('.jo-ref-line');
+      refEls.forEach(refEl => {
+        refEl.style.background = 'transparent';
+        refEl.style.boxShadow = 'none';
+        refEl.style.alignSelf = (hAlignLT === 'left') ? 'flex-start' : (hAlignLT === 'right') ? 'flex-end' : (hAlignLT === 'justify' ? 'stretch' : 'center');
+        refEl.style.textAlign = (hAlignLT === 'justify') ? 'justify' : hAlignLT;
+      });
+
+      const bodyEls = elements.txt.querySelectorAll('.jo-body');
+      bodyEls.forEach(bodyEl => {
+        bodyEl.style.width = '100%';
+        bodyEl.style.boxSizing = 'border-box';
+        bodyEl.style.paddingLeft = bodyInset;
+        bodyEl.style.paddingRight = bodyInset;
+        bodyEl.style.textAlign = (verseAlign === 'justify') ? 'justify' : verseAlign;
+        bodyEl.style.alignSelf = (verseAlign === 'left') ? 'flex-start' : (verseAlign === 'right') ? 'flex-end' : (verseAlign === 'justify' ? 'stretch' : 'center');
+      });
+    }
+
+    function applyLtAnchorMode(anchorMode) {
+      const isTop = anchorMode === 'top';
+      elements.ltWrap.style.top = isTop ? '0' : 'auto';
+      elements.ltWrap.style.bottom = isTop ? 'auto' : '0';
+      elements.ltWrap.style.alignItems = isTop ? 'flex-start' : 'flex-end';
+      elements.ltWrap.style.transformOrigin = isTop ? 'center top' : 'center bottom';
+      elements.txt.style.transformOrigin = isTop ? 'center top' : 'center bottom';
+      elements.ltWrap.style.background = isTop
+        ? 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.85) 15%, rgba(0, 0, 0, 0.7) 30%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.3) 70%, rgba(0, 0, 0, 0.1) 85%, rgba(0, 0, 0, 0) 100%)'
+        : 'linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.85) 15%, rgba(0, 0, 0, 0.7) 30%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.3) 70%, rgba(0, 0, 0, 0.1) 85%, rgba(0, 0, 0, 0) 100%)';
+      elements.ltInner.style.transformOrigin = isTop ? 'center top' : 'center bottom';
+      elements.ltCrossfade.style.transformOrigin = isTop ? 'center top' : 'center bottom';
+    }
+    
+    function registerIncomingFonts(fonts) {
+      (fonts || []).forEach(f => {
+        if (!f || !f.name || !f.dataUrl || loadedFonts.has(f.name)) return;
+        try {
+          const face = new FontFace(f.name, `url(${f.dataUrl})`);
+          face.load().then(loaded => document.fonts.add(loaded)).catch(() => {});
+        } catch (e) {
+          const style = document.createElement('style');
+          style.innerHTML = `@font-face{font-family:'${f.name}';src:url('${f.dataUrl}') format('truetype');font-display:swap;}`;
+          document.head.appendChild(style);
+        }
+        loadedFonts.add(f.name);
+      });
+    }
+
+    // Determine script and return font stack, direction, and googleFamily to dynamically load when needed
+    function chooseFontAndDirection(d = {}, text = '') {
+      const preferred = (d && d.fontFamily) ? String(d.fontFamily) : null;
+      text = String(text || d.text || '').trim();
+
+      const ranges = {
+        arabic: /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/,
+        cjk: /[\u4E00-\u9FFF\u3400-\u4DBF\u20000-\u2A6DF]/u,
+        devanagari: /[\u0900-\u097F]/,
+        bengali: /[\u0980-\u09FF]/,
+        gurmukhi: /[\u0A00-\u0A7F]/,
+        gujarati: /[\u0A80-\u0AFF]/,
+        oriya: /[\u0B00-\u0B7F]/,
+        tamil: /[\u0B80-\u0BFF]/,
+        telugu: /[\u0C00-\u0C7F]/,
+        kannada: /[\u0C80-\u0CFF]/,
+        malayalam: /[\u0D00-\u0D7F]/,
+        sinhala: /[\u0D80-\u0DFF]/,
+        myanmar: /[\u1000-\u109F]/,
+        ethiopic: /[\u1200-\u137F]/,
+        thai: /[\u0E00-\u0E7F]/,
+        lao: /[\u0E80-\u0EFF]/,
+        khmer: /[\u1780-\u17FF]/,
+        hebrew: /[\u0590-\u05FF]/,
+        greek: /[\u0370-\u03FF]/,
+        cyrillic: /[\u0400-\u04FF]/,
+        armenian: /[\u0530-\u058F]/,
+        georgian: /[\u10A0-\u10FF]/
+      };
+
+      // Prefer the explicitly selected/uploaded font first, then fallbacks
+      const merge = (fallback) => preferred ? (String(preferred).trim() + ', ' + fallback) : fallback;
+
+      if (ranges.arabic.test(text)) {
+        const fb = "'Noto Sans Arabic', 'Noto Naskh Arabic', 'Segoe UI', 'Arial', sans-serif";
+        return { fontFamily: merge(fb), direction: 'rtl', textAlign: 'right', googleFamily: 'Noto Sans Arabic:wght@400;700' };
+      }
+
+      if (ranges.cjk.test(text)) {
+        const fb = "'Noto Sans SC', 'Noto Sans TC', 'PingFang SC', 'Microsoft YaHei', 'WenQuanYi Micro Hei', 'Arial Unicode MS', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'center', googleFamily: 'Noto Sans SC:wght@400;700' };
+      }
+
+      if (ranges.devanagari.test(text)) {
+        const fb = "'Noto Sans Devanagari', 'Noto Serif Devanagari', 'Mangal', 'Nirmala UI', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans Devanagari:wght@400;700' };
+      }
+
+      if (ranges.bengali.test(text)) {
+        const fb = "'Noto Sans Bengali', 'Noto Serif Bengali', 'Vrinda', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans Bengali:wght@400;700' };
+      }
+
+      if (ranges.gurmukhi.test(text)) {
+        const fb = "'Noto Sans Gurmukhi', 'Raavi', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans Gurmukhi:wght@400;700' };
+      }
+
+      if (ranges.gujarati.test(text)) {
+        const fb = "'Noto Sans Gujarati', 'Shruti', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans Gujarati:wght@400;700' };
+      }
+
+      if (ranges.oriya.test(text)) {
+        const fb = "'Noto Sans Oriya', 'Kalinga', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans Oriya:wght@400;700' };
+      }
+
+      if (ranges.tamil.test(text)) {
+        const fb = "'Noto Sans Tamil', 'Lohit Tamil', 'Nirmala UI', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans Tamil:wght@400;700' };
+      }
+
+      if (ranges.telugu.test(text)) {
+        const fb = "'Noto Sans Telugu', 'Lohit Telugu', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans Telugu:wght@400;700' };
+      }
+
+      if (ranges.kannada.test(text)) {
+        const fb = "'Noto Sans Kannada', 'Lohit Kannada', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans Kannada:wght@400;700' };
+      }
+
+      if (ranges.malayalam.test(text)) {
+        const fb = "'Noto Sans Malayalam', 'Lohit Malayalam', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans Malayalam:wght@400;700' };
+      }
+
+      if (ranges.sinhala.test(text)) {
+        const fb = "'Noto Sans Sinhala', 'Iskoola Pota', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans Sinhala:wght@400;700' };
+      }
+
+      if (ranges.myanmar.test(text)) {
+        const fb = "'Noto Sans Myanmar', 'Myanmar Text', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans Myanmar:wght@400;700' };
+      }
+
+      if (ranges.ethiopic.test(text)) {
+        const fb = "'Noto Sans Ethiopic', 'Abyssinica SIL', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans Ethiopic:wght@400;700' };
+      }
+
+      if (ranges.thai.test(text)) {
+        const fb = "'Noto Sans Thai', 'Th Sarabun', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans Thai:wght@400;700' };
+      }
+
+      if (ranges.lao.test(text)) {
+        const fb = "'Noto Sans Lao', 'Phetsarath', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans Lao:wght@400;700' };
+      }
+
+      if (ranges.khmer.test(text)) {
+        const fb = "'Noto Sans Khmer', 'Khmer OS', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans Khmer:wght@400;700' };
+      }
+
+      if (ranges.hebrew.test(text)) {
+        const fb = "'Noto Sans Hebrew', 'Arial', sans-serif";
+        return { fontFamily: merge(fb), direction: 'rtl', textAlign: 'right', googleFamily: 'Noto Sans Hebrew:wght@400;700' };
+      }
+
+      if (ranges.greek.test(text) || ranges.cyrillic.test(text) || ranges.armenian.test(text) || ranges.georgian.test(text)) {
+        const fb = "'Noto Sans', 'Segoe UI', 'Arial', sans-serif";
+        return { fontFamily: merge(fb), direction: 'ltr', textAlign: 'left', googleFamily: 'Noto Sans:wght@400;700' };
+      }
+
+      return { fontFamily: preferred || "'Montserrat', sans-serif", direction: d.direction || 'ltr', textAlign: d.textAlign || 'center' };
+    }
+    
+    function clearTypeTimers() {
+      if (typeAnim.rafId) {
+        cancelAnimationFrame(typeAnim.rafId);
+      }
+      typeAnim.rafId = null;
+      typeAnim.words = [];
+    }
+
+    function cancelPendingClear() {
+      if (clearTimer) {
+        clearTimeout(clearTimer);
+        clearTimer = null;
+      }
+      clearToken += 1;
+    }
+    
+    function buildTypedLine(htmlLine) {
+      const temp = document.createElement('div');
+      temp.innerHTML = htmlLine || '';
+      const lineEl = document.createElement('div');
+      lineEl.className = 'type-line';
+      
+      const processNode = (node, parent) => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const parts = node.textContent.split(/(\s+)/);
+          parts.forEach(part => {
+            if (!part) return;
+            if (/^\s+$/.test(part)) {
+              parent.appendChild(document.createTextNode(part));
+            } else {
+              const w = document.createElement('span');
+              w.className = 'type-word hidden-word';
+              w.textContent = part;
+              parent.appendChild(w);
+            }
+          });
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          const clone = node.cloneNode(false);
+          parent.appendChild(clone);
+          node.childNodes.forEach(child => processNode(child, clone));
+        }
+      };
+      
+      temp.childNodes.forEach(child => processNode(child, lineEl));
+      return lineEl;
+    }
+
+    // Recompute normalized layout and reapply preserved LT layout on window resize
+    function handleLtLayoutResize() {
+      if (window._joResizeRaf) cancelAnimationFrame(window._joResizeRaf);
+      window._joResizeRaf = requestAnimationFrame(() => {
+        window._joResizeRaf = null;
+        if (!lastSongLtLayout || (lastSongLtLayout.visualBottom == null && lastSongLtLayout.visualTop == null)) return;
+
+        if (lastSongLtLayout.heightVh != null) {
+          const ltHeightPx = (lastSongLtLayout.heightVh / 100) * window.innerHeight;
+          if (lastSongLtLayout.padTopNorm != null) {
+            lastSongLtLayout.padTopPx = Math.round(lastSongLtLayout.padTopNorm * ltHeightPx);
+          } else if (lastSongLtLayout.padTopPx != null && ltHeightPx > 0) {
+            lastSongLtLayout.padTopNorm = lastSongLtLayout.padTopPx / ltHeightPx;
+            lastSongLtLayout.padTopPx = Math.round(lastSongLtLayout.padTopNorm * ltHeightPx);
+          }
+          if (lastSongLtLayout.padBottomNorm != null) {
+            lastSongLtLayout.padBottomPx = Math.round(lastSongLtLayout.padBottomNorm * ltHeightPx);
+          } else if (lastSongLtLayout.padBottomPx != null && ltHeightPx > 0) {
+            lastSongLtLayout.padBottomNorm = lastSongLtLayout.padBottomPx / ltHeightPx;
+            lastSongLtLayout.padBottomPx = Math.round(lastSongLtLayout.padBottomNorm * ltHeightPx);
+          }
+        } else {
+          // If no stored LT vh, attempt to infer from current LT wrap height
+          const inferredRect = elements.ltWrap ? elements.ltWrap.getBoundingClientRect() : null;
+          const inferredLtHeightPx = inferredRect ? inferredRect.height : 0;
+          if (inferredLtHeightPx > 0) {
+            if (lastSongLtLayout.padTopPx != null) lastSongLtLayout.padTopNorm = lastSongLtLayout.padTopPx / inferredLtHeightPx;
+            if (lastSongLtLayout.padBottomPx != null) lastSongLtLayout.padBottomNorm = lastSongLtLayout.padBottomPx / inferredLtHeightPx;
+          }
+        }
+
+        if (lastSongLtLayout.visualBottomNorm != null) {
+          lastSongLtLayout.visualBottom = Math.round(lastSongLtLayout.visualBottomNorm * window.innerHeight);
+        } else if (lastSongLtLayout.visualBottom != null) {
+          lastSongLtLayout.visualBottomNorm = lastSongLtLayout.visualBottom / window.innerHeight;
+        }
+        if (lastSongLtLayout.visualTopNorm != null) {
+          lastSongLtLayout.visualTop = Math.round(lastSongLtLayout.visualTopNorm * window.innerHeight);
+        } else if (lastSongLtLayout.visualTop != null) {
+          lastSongLtLayout.visualTopNorm = lastSongLtLayout.visualTop / window.innerHeight;
+        }
+
+        // If currently showing LT with BG off for songs, reapply stored layout to keep visual position stable
+        if (currentState.mode === 'lt' && !currentState.isBible) {
+          const ltWrapOpacity = getComputedStyle(elements.ltWrap).opacity;
+          if (ltWrapOpacity === '0') {
+            const isTopAnchor = (lastSongLtLayout.anchor === 'top');
+            const sidePad = lastSongLtLayout.sidePad || '10%';
+            const pt = lastSongLtLayout.padTopPx || 0;
+            const pb = lastSongLtLayout.padBottomPx || 0;
+            const vt = lastSongLtLayout.visualTop || 0;
+            const vb = lastSongLtLayout.visualBottom || 0;
+            elements.txt.style.height = 'auto';
+            elements.txt.style.overflow = 'visible';
+            elements.txt.style.padding = `${pt}px ${sidePad} ${pb}px`;
+            elements.txt.style.justifyContent = 'center';
+            elements.txt.style.top = isTopAnchor ? `${vt}px` : 'auto';
+            elements.txt.style.bottom = isTopAnchor ? 'auto' : `${vb}px`;
+          }
+        }
+      });
+    }
+    
+    function applyTypeOn(d, mode, isBible) {
+      const standardTarget = elements.txt.querySelector('.text-anim-content');
+      const target = (mode === 'custom') ? elements.customMainBar : (standardTarget || elements.txt);
+      const customBgWasActive = (!animateBgTransitions && mode === 'custom');
+      const effectiveTarget = (mode === 'custom' && customBgWasActive && elements.customMainText) ? elements.customMainText : target;
+      if (!target) return;
+      
+      const textKey = d.text || '';
+      const sameText = typeAnim.textKey === textKey && typeAnim.startTime > 0;
+      const now = performance.now();
+      const durationSec = clamp(Number(d.transitionDuration || 1), 0.1, 10);
+      const durationMs = durationSec * 1000;
+      const startTime = sameText ? typeAnim.startTime : now;
+      
+      clearTypeTimers();
+      
+      const rawHtml = d.text || '';
+      const lines = rawHtml.replace(/<br\s*\/?>/gi, '\n').split('\n');
+      effectiveTarget.innerHTML = '';
+      
+      lines.forEach((line) => {
+        const lineEl = buildTypedLine(line);
+        lineEl.style.margin = '0';
+        lineEl.style.lineHeight = 'inherit';
+        effectiveTarget.appendChild(lineEl);
+      });
+      
+      const words = Array.from(effectiveTarget.querySelectorAll('.type-word'));
+      if (!words.length) return;
+      
+      typeAnim.textKey = textKey;
+      typeAnim.startTime = startTime;
+      typeAnim.duration = durationMs;
+      typeAnim.words = words;
+      
+      const step = () => {
+        const elapsed = Math.max(0, performance.now() - typeAnim.startTime);
+        const progress = Math.min(1, elapsed / typeAnim.duration);
+        const visibleCount = Math.ceil(progress * words.length);
+        words.forEach((w, idx) => {
+          if (idx < visibleCount) {
+            w.classList.remove('hidden-word');
+            w.classList.add('revealed-word');
+          } else {
+            w.classList.add('hidden-word');
+            w.classList.remove('revealed-word');
+          }
+        });
+        if (progress < 1) {
+          typeAnim.rafId = requestAnimationFrame(step);
+        } else {
+          typeAnim.rafId = null;
+        }
+      };
+      
+      // Apply initial visibility based on elapsed when re-rendering
+      const initialElapsed = Math.max(0, now - startTime);
+      const initialProgress = Math.min(1, initialElapsed / durationMs);
+      const initialVisible = Math.ceil(initialProgress * words.length);
+      words.forEach((w, idx) => {
+        if (idx < initialVisible) {
+          w.classList.remove('hidden-word');
+          w.classList.add('revealed-word');
+        }
+      });
+      
+      typeAnim.rafId = requestAnimationFrame(step);
+    }
+    
+    // ===== ANIMATIONS =====
+    function applyTransitionEffects(d, mode, isBible) {
+      const t = (d.transitionType || 'fade').toLowerCase();
+      const baseDuration = clamp(Number(d.transitionDuration || 0.8), 0.1, 10);
+      const isZoomType = (t === 'zoom-type');
+      const usesType = (t === 'type' || isZoomType);
+      const zoomDuration = isZoomType ? baseDuration + 0.3 : baseDuration; // slight hold after typing finishes
+      
+      if (usesType) {
+        applyTypeOn(d, mode, isBible);
+        if (t === 'type') {
+          // When Animate Background is enabled, fade the background in alongside the type-on text
+          if (animateBgTransitions && mode !== 'custom') {
+            const bgEl = (mode === 'full') ? elements.bg : elements.ltWrap;
+            const textKey = d.text || '';
+            const sameBg = transitionState.textKey === textKey && transitionState.type === t && transitionState.startTime > 0;
+            if (bgEl && !sameBg) {
+              transitionState.textKey = textKey;
+              transitionState.type = t;
+              transitionState.startTime = performance.now();
+              transitionState.duration = baseDuration;
+              bgEl.classList.remove('transition-anim', 'anim-fade', 'anim-zoom', 'anim-write');
+              bgEl.style.animation = 'none';
+              void bgEl.offsetWidth;
+              bgEl.style.animation = '';
+              bgEl.style.animationDuration = `${baseDuration}s`;
+              bgEl.classList.add('transition-anim', 'anim-fade');
+              bgEl.addEventListener('animationend', () => {
+                bgEl.classList.remove('transition-anim', 'anim-fade');
+              }, { once: true });
+            }
+          }
+          return;
+        }
+      } else {
+        clearTypeTimers();
+      }
+      
+      const textKey = d.text || '';
+      const now = performance.now();
+      const sameTransition = transitionState.textKey === textKey && transitionState.type === t && transitionState.duration === zoomDuration && transitionState.startTime > 0;
+      const startTime = sameTransition ? transitionState.startTime : now;
+      transitionState.textKey = textKey;
+      transitionState.type = t;
+      transitionState.startTime = startTime;
+      transitionState.duration = zoomDuration;
+      const elapsedSec = Math.min(zoomDuration, Math.max(0, (now - startTime) / 1000));
+      const animClass = (t === 'zoom' || isZoomType) ? 'anim-zoom' : (t === 'write' ? 'anim-write' : 'anim-fade');
+      const targets = [];
+      const textTargets = [];
+      const bgTargets = [];
+      const customBgWasActive = (!animateBgTransitions && mode === 'custom');
+      if (mode === 'custom') {
+        if (customBgWasActive) {
+          if (elements.customMainText) textTargets.push(elements.customMainText);
+          if (isBible && elements.customRefText) textTargets.push(elements.customRefText);
+          if (isBible && elements.customVersionText) textTargets.push(elements.customVersionText);
+        } else {
+          targets.push(elements.customMainBar);
+          if (isBible) targets.push(elements.customRefBox);
+          if (isBible) targets.push(elements.customVersionBar);
+        }
+      } else {
+        const standardTarget = elements.txt.querySelector('.text-anim-content');
+        targets.push(standardTarget || elements.txt);
+        // When Animate Background is enabled, animate the background layer alongside the text
+        if (animateBgTransitions) {
+          if (mode === 'full') bgTargets.push(elements.bg);
+          else if (mode === 'lt') bgTargets.push(elements.ltWrap);
+        }
+      }
+      
+      const applyAnim = (el) => {
+        if (!el) return;
+        el.classList.remove('transition-anim', 'anim-fade', 'anim-zoom', 'anim-write');
+        el.style.animation = 'none';
+        void el.offsetWidth; // reflow to restart animation
+        el.style.animation = '';
+        el.style.animationDuration = `${zoomDuration}s`;
+        el.style.animationDelay = `${-elapsedSec}s`;
+        el.classList.add('transition-anim', animClass);
+      };
+      
+      targets.forEach(applyAnim);
+      textTargets.forEach(applyAnim);
+      // Background targets always use fade-only to avoid transform/clip-path displacement
+      bgTargets.forEach(el => {
+        if (!el) return;
+        el.classList.remove('transition-anim', 'anim-fade', 'anim-zoom', 'anim-write');
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+        el.style.animationDuration = `${zoomDuration}s`;
+        el.style.animationDelay = `${-elapsedSec}s`;
+        el.classList.add('transition-anim', 'anim-fade');
+        el.addEventListener('animationend', () => {
+          el.classList.remove('transition-anim', 'anim-fade');
+        }, { once: true });
+      });
+    }
+    
+    // ===== RENDERER =====
+    // Handle update with proper sequencing
+    function handleUpdate(d) {
+      cancelPendingClear();
+      // Store current state
+      currentState = { ...currentState, ...d };
+      
+      const mode = (d.mode === 'full') ? 'full' : (d.mode === 'custom' ? 'custom' : 'lt');
+      const isBible = !!d.isBible;
+      const useCustomStyle = (mode === 'custom');
+      const ltAnchorMode = getLtAnchorMode(d);
+      currentState.transitionType = (d.transitionType || currentState.transitionType || '');
+      animateBgTransitions = d.animateBgTransitions !== false;
+      registerIncomingFonts(d.customFonts);
+      prevBgState = { full: bgActivePrev, lt: ltBgActivePrev, custom: customBgActivePrev };
+      
+      // Update container classes
+      elements.cont.className = `mode-${mode} ${isBible ? 'lt-bible' : 'lt-song'} lt-anchor-${ltAnchorMode} hardware-accelerated`;
+      applyLtAnchorMode(ltAnchorMode);
+      
+      // Ensure LT layers are fully hidden in custom mode
+      if (mode === 'custom') {
+        elements.ltWrap.style.opacity = '0';
+        elements.ltWrap.style.height = '0';
+        elements.ltWrap.style.bottom = '0';
+        elements.ltWrap.style.top = 'auto';
+        elements.ltInner.style.backgroundImage = 'none';
+        elements.ltInner.style.backgroundColor = 'transparent';
+        elements.bg.style.opacity = '0';
+        elements.txt.style.position = 'absolute';
+        elements.txt.style.left = '0';
+        elements.txt.style.right = '0';
+        elements.txt.style.bottom = 'auto';
+        elements.txt.style.top = 'auto';
+        elements.txt.style.width = '100%';
+        elements.txt.style.padding = `0 ${Math.max(0, Number(currentState.padLRFull ?? currentState.padLR ?? 5))}%`;
+        elements.txt.style.display = 'none';
+      }
+      
+      // Set text content based on mode
+      if (mode === 'custom') {
+        elements.txt.innerHTML = '';
+        elements.txt.style.display = 'none';
+      } else {
+        elements.txt.innerHTML = `<div class="text-anim-content">${d.text || ''}</div>`;
+        const isDualMode = !!d.dualVersionMode;
+        elements.txt.classList.toggle('dual-mode', isDualMode);
+        elements.cont.classList.toggle('dual-mode', isDualMode);
+        elements.txt.style.display = 'flex';
+      }
+      elements.txt.style.color = d.textColor || '#ffffff';
+      elements.txt.style.fontWeight = d.fontWeight || '700';
+      
+      // Handle different modes
+      if (mode === 'custom' && useCustomStyle) {
+        handleCustomMode(d, isBible);
+      } else {
+        handleStandardMode(d, mode, isBible);
+      }
+      
+      // Handle background
+      handleBackground(d, mode, isBible);
+      
+      // Apply configured transition
+      applyTransitionEffects(d, mode, isBible);
+
+      // Log applied font info for diagnostics
+      try {
+        if (DEBUG_MODE) {
+          const computed = window.getComputedStyle(elements.txt).fontFamily;
+          debug(`Requested font: ${d.fontFamily || '(none)'}; inline style: ${elements.txt.style.fontFamily || '(none)'}; computed: ${computed}`);
+          const refEl = elements.txt.querySelector('.jo-ref-line');
+          if (refEl) debug(`Ref element computed font: ${window.getComputedStyle(refEl).fontFamily}`);
+          if (elements.customMainBar && elements.customMainBar.style.display !== 'none') {
+            debug(`Custom main bar inline: ${elements.customMainBar.style.fontFamily || '(none)'}; computed: ${window.getComputedStyle(elements.customMainBar).fontFamily}`);
+          }
+        }
+      } catch (e) {
+        console.error('Font diagnostic logging failed', e);
+      }
+    }
+    
+    // Handle custom mode (professional styles)
+    function handleCustomMode(d, isBible) {
+      const styleData = d.styleData || {};
+      const textX = Number(d.textX || 0);
+      const textY = Number(d.textY || 860);
+      
+      // Hide standard elements
+      elements.txt.style.opacity = '0';
+      elements.txt.style.display = 'none';
+      elements.ltWrap.style.opacity = '0';
+      elements.ltWrap.style.height = '0';
+      elements.ltWrap.style.bottom = '0';
+      elements.ltWrap.style.top = 'auto';
+      elements.ltInner.style.backgroundImage = 'none';
+      elements.ltInner.style.backgroundColor = 'transparent';
+      elements.bg.style.opacity = '0';
+      elements.bg.style.backgroundImage = 'none';
+      
+      // Show custom elements
+      elements.customRefBox.style.display = 'flex';
+      elements.customMainBar.style.display = 'flex';
+      if (elements.customVersionBar) elements.customVersionBar.style.display = 'none';
+      elements.customRefBox.style.opacity = '1';
+      elements.customMainBar.style.opacity = '1';
+      if (elements.customVersionBar) elements.customVersionBar.style.opacity = '1';
+      
+      // Set reference box content
+      if (isBible) {
+        const refText = d.bibleRef || '';
+        const versionText = (d.bibleVersion || '').trim();
+        const hasVersionBarStyle = !!(styleData && (
+          (styleData.versionBar && Object.keys(styleData.versionBar).length) ||
+          (styleData.textPropsVersion && Object.keys(styleData.textPropsVersion).length)
+        ));
+        const useVersionBar = hasVersionBarStyle && !!versionText;
+        const verText = (!useVersionBar && versionText) ? ` (${d.bibleVersion})` : '';
+        elements.customRefBox.innerHTML = `<div id="custom-ref-text" class="custom-ref-text">${refText + verText}</div>`;
+        if (elements.customVersionBar) {
+          if (useVersionBar) {
+            elements.customVersionBar.style.display = 'flex';
+            elements.customVersionBar.innerHTML = `<div id="custom-version-text" class="custom-version-text">${versionText}</div>`;
+          } else {
+            elements.customVersionBar.style.display = 'none';
+            elements.customVersionBar.innerHTML = '';
+          }
+        }
+        elements.customVersionBarUse = useVersionBar;
+      } else {
+        elements.customRefBox.innerHTML = `<div id="custom-ref-text" class="custom-ref-text">Lyrics</div>`;
+        if (elements.customVersionBar) {
+          elements.customVersionBar.style.display = 'none';
+          elements.customVersionBar.innerHTML = '';
+        }
+        elements.customVersionBarUse = false;
+      }
+      elements.customRefText = document.getElementById('custom-ref-text');
+      elements.customVersionText = document.getElementById('custom-version-text');
+      
+      // Set main bar content
+      elements.customMainBar.innerHTML = `<div id="custom-main-text" class="custom-main-text">${d.text || ''}</div>`;
+      elements.customMainText = document.getElementById('custom-main-text');
+      
+      // Apply style data
+      applyCustomStyle(d, styleData, textX, textY, isBible, { useVersionBar: !!elements.customVersionBarUse });
+      
+      // Special handling for Bible custom mode not needed; custom elements carry the content
+    }
+    
+    function normalizeOpacity(value, fallback = 1) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return fallback;
+      return clamp(num > 1 ? num / 100 : num, 0, 1);
+    }
+
+    function parseRgbColor(raw) {
+      if (!raw) return null;
+      const value = String(raw).trim();
+      if (value.startsWith('#')) {
+        const hex = value.slice(1);
+        if (hex.length === 3) {
+          const r = parseInt(hex[0] + hex[0], 16);
+          const g = parseInt(hex[1] + hex[1], 16);
+          const b = parseInt(hex[2] + hex[2], 16);
+          return { r, g, b };
+        }
+        if (hex.length === 6) {
+          const r = parseInt(hex.slice(0, 2), 16);
+          const g = parseInt(hex.slice(2, 4), 16);
+          const b = parseInt(hex.slice(4, 6), 16);
+          return { r, g, b };
+        }
+      }
+      const match = value.match(/^rgba?\(([^)]+)\)$/i);
+      if (match) {
+        const parts = match[1].split(',').map(p => p.trim());
+        if (parts.length >= 3) {
+          const r = parseFloat(parts[0]);
+          const g = parseFloat(parts[1]);
+          const b = parseFloat(parts[2]);
+          if (Number.isFinite(r) && Number.isFinite(g) && Number.isFinite(b)) {
+            return { r, g, b };
+          }
+        }
+      }
+      return null;
+    }
+
+    function toRgba(color, opacity) {
+      const rgb = parseRgbColor(color);
+      if (!rgb) return color;
+      return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+    }
+
+    // Apply custom style properties
+    function applyCustomStyle(d, styleData, textX, textY, isBible, opts = {}) {
+      const refBox = styleData.refBox || {};
+      const mainBar = styleData.mainBar || {};
+      const textMain = styleData.textPropsMain || styleData.textProps || {};
+      const textRef = styleData.textPropsRef || styleData.textProps || {};
+      const versionBar = styleData.versionBar || {};
+      const textVersion = styleData.textPropsVersion || {};
+      const shadow = styleData.shadow || {};
+      const useVersionBar = !!opts.useVersionBar;
+      const mainHAlign = textMain.hAlign || mainBar.hAlign || 'left';
+      const mainVAlign = textMain.vAlign || mainBar.vAlign || 'middle';
+      const mainTextAlign = textMain.textAlign ||
+        (mainHAlign === 'center' ? 'center' : mainHAlign === 'right' ? 'right' : mainHAlign === 'justify' ? 'justify' : 'left');
+      const mainSingleLine = (textMain.singleLine === true || textMain.singleLine === 'true');
+      const mainLetterSpacing = textMain.letterSpacing || 0;
+      const mainTextTransform = textMain.textTransform || 'none';
+      const mainOffsetX = textMain.offsetX || 0;
+      const mainOffsetY = textMain.offsetY || 0;
+      const barX = mainBar.x || 0;
+      const barYOffset = (mainBar.yOffset != null) ? mainBar.yOffset : (mainBar.y != null ? mainBar.y : 220);
+      const refAlign = textRef.textAlign || 'center';
+      const refHAlign = textRef.hAlign || 'center';
+      const refVAlign = textRef.vAlign || 'middle';
+      // Force single line by default; allow opt-out by setting singleLine:false
+      const refSingleLine = !(textRef.singleLine === false || textRef.singleLine === 'false');
+      const refLetterSpacing = textRef.letterSpacing || 0;
+      const refTextTransform = textRef.textTransform || 'none';
+      const refOffsetX = textRef.offsetX || 0;
+      const refOffsetY = textRef.offsetY || 0;
+      const refTextColor = textRef.color || '#ffffff';
+      const refOpacity = normalizeOpacity(refBox.opacity, 0.95);
+      const viewportWidth = Math.max(window.innerWidth || 1920, 1);
+      
+      // Reference box styling
+      const refTextSample = (elements.customRefText ? elements.customRefText.textContent : (d.bibleRef || d.text || ''));
+      const refFont = chooseFontAndDirection({ fontFamily: textRef.fontFamily || d.fontFamily }, refTextSample);
+      if (refFont.googleFamily) loadGoogleFontIfNeeded(refFont.googleFamily);
+      else if (d && d.fontFamily) {
+        const mapped = mapFontFamilyToGoogle(d.fontFamily);
+        if (mapped) loadGoogleFontIfNeeded(mapped);
+      }
+      elements.customRefBox.style.fontFamily = refFont.fontFamily;
+      elements.customRefBox.style.direction = refFont.direction;
+      if (refFont.direction === 'rtl') elements.customRefBox.style.unicodeBidi = 'plaintext';
+      const refFontSize = (textRef.fontSize != null) ? textRef.fontSize : (refBox.fontSize || 36);
+      const refFontWeight = (textRef.fontWeight != null) ? textRef.fontWeight : (refBox.fontWeight || 700);
+      elements.customRefBox.style.fontSize = refFontSize + 'px';
+      elements.customRefBox.style.fontWeight = `${refFontWeight}`;
+      const refPadX = (refBox.padX != null ? refBox.padX : 24);
+      const refPadY = (refBox.padY != null ? refBox.padY : 10);
+      const refMinWidth = refBox.minWidth || 200;
+      const refBaseWidth = (refBox.width != null) ? refBox.width : refMinWidth;
+      let refWidth = refBaseWidth;
+      const refHeight = refBox.height || 92;
+      const refLeft = clamp(textX + (refBox.x || 28), 0, Math.max(0, viewportWidth - refWidth));
+      elements.customRefBox.style.padding = `${refPadY}px ${refPadX}px`;
+      // Prepare accurate measurement by resetting width and ensuring whitespace mode first
+      elements.customRefBox.style.width = 'auto';
+      if (elements.customRefText) elements.customRefText.style.whiteSpace = refSingleLine ? 'nowrap' : 'normal';
+      // If text is available, auto-grow width to fit reference + version
+      if (elements.customRefText) {
+        const measured = elements.customRefText.scrollWidth || 0;
+        const targetWidth = measured + refPadX * 2 + (refBox.extraWidth || 0);
+        // Clamp between a sensible minimum and viewport; allow shrinking back down
+        refWidth = Math.min(Math.max(refMinWidth, targetWidth), viewportWidth - 20);
+      }
+      elements.customRefBox.style.width = `${refWidth}px`;
+      elements.customRefBox.style.height = `${refHeight}px`;
+      const refTop = textY + (refBox.yOffset || -65);
+      elements.customRefBox.style.left = `${refLeft}px`;
+      elements.customRefBox.style.top = `${refTop}px`;
+      const refFillType = refBox.fillType || (refBox.gradientStart || refBox.gradientEnd ? 'gradient' : 'color');
+      const refGradStart = refBox.gradientStart || refBox.bgColor || '#00411C';
+      const refGradEnd = refBox.gradientEnd || refGradStart;
+      if (refFillType === 'gradient') {
+        elements.customRefBox.style.background = `linear-gradient(90deg, ${toRgba(refGradStart, refOpacity)} 0%, ${toRgba(refGradEnd, refOpacity)} 100%)`;
+      } else {
+        elements.customRefBox.style.background = toRgba(refBox.bgColor || refGradStart, refOpacity);
+      }
+      elements.customRefBox.style.borderColor = toRgba(refBox.borderColor || '#FFFFFF', refOpacity);
+      elements.customRefBox.style.borderWidth = (refBox.borderWidth || 2) + 'px';
+      elements.customRefBox.style.borderRadius = (refBox.borderRadius || 10) + 'px';
+      elements.customRefBox.style.color = refTextColor;
+      elements.customRefBox.style.letterSpacing = refLetterSpacing + 'px';
+      elements.customRefBox.style.textTransform = refTextTransform;
+      elements.customRefBox.style.textAlign = (refHAlign === 'justify') ? 'justify' : (refHAlign === 'left' ? 'left' : (refHAlign === 'right' ? 'right' : refAlign));
+      elements.customRefBox.style.alignItems = (refHAlign === 'left') ? 'flex-start' : (refHAlign === 'right') ? 'flex-end' : (refHAlign === 'justify' ? 'stretch' : 'center');
+      elements.customRefBox.style.justifyContent = (refVAlign === 'top') ? 'flex-start' : (refVAlign === 'bottom' ? 'flex-end' : 'center');
+      elements.customRefBox.style.whiteSpace = refSingleLine ? 'nowrap' : 'normal';
+      elements.customRefBox.style.lineHeight = (textRef.lineSpacing || 1.2);
+      elements.customRefBox.style.wordSpacing = (textRef.wordSpacing || 0) + 'px';
+      const refRotation = refBox.rotation || 0;
+      elements.customRefBox.style.transform = `translate(${refOffsetX}px, ${refOffsetY}px) rotate(${refRotation}deg)`;
+      elements.customRefBox.style.transformOrigin = 'top left';
+      if (refBox.zIndex != null) elements.customRefBox.style.zIndex = refBox.zIndex;
+      const refShadow = textRef.shadow || shadow || {};
+      const refShadowOpacity = normalizeOpacity(refShadow.opacity, 0);
+      const refShadowX = refShadow.offsetX || 0;
+      const refShadowY = refShadow.offsetY != null ? refShadow.offsetY : refShadowX;
+      const refShadowBlur = refShadow.blur || 0;
+      const refShadowValue = `${refShadowX}px ${refShadowY}px ${refShadowBlur}px ${toRgba(refShadow.color || '#000000', refShadowOpacity)}`;
+      elements.customRefBox.style.textShadow = refShadowValue;
+      if (elements.customRefText) {
+        elements.customRefText.style.lineHeight = (textRef.lineSpacing || 1.2);
+        elements.customRefText.style.wordSpacing = (textRef.wordSpacing || 0) + 'px';
+        elements.customRefText.style.letterSpacing = refLetterSpacing + 'px';
+        elements.customRefText.style.textTransform = refTextTransform;
+        elements.customRefText.style.textAlign = (refHAlign === 'justify') ? 'justify' : (refHAlign === 'left' ? 'left' : (refHAlign === 'right' ? 'right' : refAlign));
+        elements.customRefText.style.whiteSpace = refSingleLine ? 'nowrap' : 'normal';
+        const refTextRotation = textRef.rotation || 0;
+        const refTextOpacity = normalizeOpacity(textRef.opacity, 1);
+        elements.customRefText.style.transform = `translate(${refOffsetX}px, ${refOffsetY}px) rotate(${refTextRotation}deg)`;
+        elements.customRefText.style.opacity = refTextOpacity;
+        elements.customRefText.style.writingMode = textRef.writingMode || 'horizontal-tb';
+        elements.customRefText.style.textOrientation = textRef.textOrientation || 'mixed';
+        elements.customRefText.style.color = refTextColor;
+        elements.customRefText.style.textShadow = refShadowValue;
+        if (textRef.zIndex != null) elements.customRefText.style.zIndex = textRef.zIndex;
+        const hasRefBounds = [textRef.x, textRef.y, textRef.width, textRef.height].some(v => v != null && v !== 0);
+        if (hasRefBounds) {
+          elements.customRefText.style.position = 'absolute';
+          if (textRef.x != null) elements.customRefText.style.left = `${textRef.x - refLeft}px`;
+          if (textRef.y != null) elements.customRefText.style.top = `${textRef.y - refTop}px`;
+          elements.customRefText.style.width = textRef.width ? `${textRef.width}px` : 'auto';
+          elements.customRefText.style.height = textRef.height ? `${textRef.height}px` : 'auto';
+        } else {
+          elements.customRefText.style.position = '';
+          elements.customRefText.style.left = '';
+          elements.customRefText.style.top = '';
+          elements.customRefText.style.width = '';
+          elements.customRefText.style.height = '';
+        }
+      }
+
+      // Version bar styling
+      if (elements.customVersionBar && elements.customVersionText && useVersionBar) {
+        const versionTextSample = elements.customVersionText.textContent || '';
+        if (!versionTextSample.trim()) {
+          elements.customVersionBar.style.display = 'none';
+        } else {
+          const versionFont = chooseFontAndDirection({ fontFamily: textVersion.fontFamily || d.fontFamily }, versionTextSample);
+          if (versionFont.googleFamily) loadGoogleFontIfNeeded(versionFont.googleFamily);
+          elements.customVersionBar.style.fontFamily = versionFont.fontFamily;
+          elements.customVersionBar.style.direction = versionFont.direction;
+          if (versionFont.direction === 'rtl') elements.customVersionBar.style.unicodeBidi = 'plaintext';
+          const versionFontSize = (textVersion.fontSize != null) ? textVersion.fontSize : 24;
+          const versionFontWeight = (textVersion.fontWeight != null) ? textVersion.fontWeight : 600;
+          elements.customVersionBar.style.fontSize = `${versionFontSize}px`;
+          elements.customVersionBar.style.fontWeight = `${versionFontWeight}`;
+          const versionPadX = (versionBar.padX != null) ? versionBar.padX : 12;
+          const versionPadY = (versionBar.padY != null) ? versionBar.padY : 8;
+          const versionMinWidth = versionBar.minWidth || 0;
+          const versionBaseWidth = (versionBar.width != null) ? versionBar.width : 200;
+          const versionExtraWidth = versionBar.extraWidth || 0;
+          let versionWidth = versionBaseWidth;
+          elements.customVersionBar.style.padding = `${versionPadY}px ${versionPadX}px`;
+          elements.customVersionBar.style.width = 'auto';
+          elements.customVersionText.style.whiteSpace = (textVersion.singleLine === false || textVersion.singleLine === 'false') ? 'normal' : 'nowrap';
+          const measured = elements.customVersionText.scrollWidth || 0;
+          const targetWidth = measured + versionPadX * 2 + versionExtraWidth;
+          versionWidth = Math.max(versionMinWidth, targetWidth, versionBaseWidth);
+          const versionHeight = versionBar.height || 50;
+          const versionLeft = clamp(textX + (versionBar.x || 0), 0, Math.max(0, viewportWidth - versionWidth));
+          const versionTop = textY + (versionBar.yOffset != null ? versionBar.yOffset : (versionBar.y || 0));
+          elements.customVersionBar.style.display = versionWidth <= 0 || versionHeight <= 0 ? 'none' : 'flex';
+          elements.customVersionBar.style.width = `${versionWidth}px`;
+          elements.customVersionBar.style.height = `${versionHeight}px`;
+          elements.customVersionBar.style.left = `${versionLeft}px`;
+          elements.customVersionBar.style.top = `${versionTop}px`;
+          const versionOpacity = normalizeOpacity(versionBar.opacity, 0.95);
+          const versionFillType = versionBar.fillType || (versionBar.gradientStart || versionBar.gradientEnd ? 'gradient' : 'color');
+          const versionGradStart = versionBar.gradientStart || versionBar.bgColor || '#1a1a2e';
+          const versionGradEnd = versionBar.gradientEnd || versionGradStart;
+          if (versionFillType === 'gradient') {
+            elements.customVersionBar.style.background = `linear-gradient(90deg, ${toRgba(versionGradStart, versionOpacity)} 0%, ${toRgba(versionGradEnd, versionOpacity)} 100%)`;
+          } else {
+            elements.customVersionBar.style.background = toRgba(versionBar.bgColor || versionGradStart, versionOpacity);
+          }
+          elements.customVersionBar.style.borderColor = toRgba(versionBar.borderColor || '#FFFFFF', versionOpacity);
+          elements.customVersionBar.style.borderWidth = `${versionBar.borderWidth || 0}px`;
+          elements.customVersionBar.style.borderRadius = `${versionBar.borderRadius || 0}px`;
+          elements.customVersionBar.style.borderStyle = 'solid';
+          const versionHAlign = textVersion.hAlign || versionBar.hAlign || 'center';
+          const versionVAlign = textVersion.vAlign || versionBar.vAlign || 'middle';
+          const versionTextAlign = textVersion.textAlign ||
+            (versionHAlign === 'center' ? 'center' : versionHAlign === 'right' ? 'right' : versionHAlign === 'justify' ? 'justify' : 'left');
+          elements.customVersionBar.style.textAlign = versionTextAlign;
+          elements.customVersionBar.style.alignItems = (versionHAlign === 'left') ? 'flex-start' : (versionHAlign === 'right') ? 'flex-end' : (versionHAlign === 'justify' ? 'stretch' : 'center');
+          elements.customVersionBar.style.justifyContent = (versionVAlign === 'top') ? 'flex-start' : (versionVAlign === 'bottom') ? 'flex-end' : 'center';
+          elements.customVersionBar.style.lineHeight = textVersion.lineSpacing || 1.2;
+          elements.customVersionBar.style.wordSpacing = (textVersion.wordSpacing || 0) + 'px';
+          elements.customVersionBar.style.letterSpacing = (textVersion.letterSpacing || 0) + 'px';
+          elements.customVersionBar.style.textTransform = textVersion.textTransform || 'none';
+          const versionRotation = versionBar.rotation || 0;
+          elements.customVersionBar.style.transform = `translate(0px, 0px) rotate(${versionRotation}deg)`;
+          elements.customVersionBar.style.transformOrigin = 'top left';
+          if (versionBar.zIndex != null) elements.customVersionBar.style.zIndex = versionBar.zIndex;
+          const versionTextColor = textVersion.color || '#ffffff';
+          elements.customVersionBar.style.color = versionTextColor;
+          if (elements.customVersionText) {
+            elements.customVersionText.style.lineHeight = textVersion.lineSpacing || 1.2;
+            elements.customVersionText.style.wordSpacing = (textVersion.wordSpacing || 0) + 'px';
+            elements.customVersionText.style.letterSpacing = (textVersion.letterSpacing || 0) + 'px';
+            elements.customVersionText.style.textTransform = textVersion.textTransform || 'none';
+            elements.customVersionText.style.textAlign = versionTextAlign;
+            elements.customVersionText.style.whiteSpace = (textVersion.singleLine === false || textVersion.singleLine === 'false') ? 'normal' : 'nowrap';
+            const versionTextRotation = textVersion.rotation || 0;
+            const versionTextOpacity = normalizeOpacity(textVersion.opacity, 1);
+            elements.customVersionText.style.transform = `translate(${textVersion.offsetX || 0}px, ${textVersion.offsetY || 0}px) rotate(${versionTextRotation}deg)`;
+            elements.customVersionText.style.opacity = versionTextOpacity;
+            elements.customVersionText.style.writingMode = textVersion.writingMode || 'horizontal-tb';
+            elements.customVersionText.style.textOrientation = textVersion.textOrientation || 'mixed';
+            elements.customVersionText.style.color = versionTextColor;
+            if (textVersion.zIndex != null) elements.customVersionText.style.zIndex = textVersion.zIndex;
+            const versionShadow = textVersion.shadow || shadow || {};
+            const versionShadowOpacity = normalizeOpacity(versionShadow.opacity, 0);
+            const versionShadowX = versionShadow.offsetX || 0;
+            const versionShadowY = versionShadow.offsetY != null ? versionShadow.offsetY : versionShadowX;
+            const versionShadowBlur = versionShadow.blur || 0;
+            const versionShadowValue = `${versionShadowX}px ${versionShadowY}px ${versionShadowBlur}px ${toRgba(versionShadow.color || '#000000', versionShadowOpacity)}`;
+            elements.customVersionBar.style.textShadow = versionShadowValue;
+            elements.customVersionText.style.textShadow = versionShadowValue;
+            const hasVersionBounds = [textVersion.x, textVersion.y, textVersion.width, textVersion.height].some(v => v != null && v !== 0);
+            if (hasVersionBounds) {
+              elements.customVersionText.style.position = 'absolute';
+              if (textVersion.x != null) elements.customVersionText.style.left = `${textVersion.x - versionLeft}px`;
+              if (textVersion.y != null) elements.customVersionText.style.top = `${textVersion.y - versionTop}px`;
+              elements.customVersionText.style.width = textVersion.width ? `${textVersion.width}px` : 'auto';
+              elements.customVersionText.style.height = textVersion.height ? `${textVersion.height}px` : 'auto';
+            } else {
+              elements.customVersionText.style.position = '';
+              elements.customVersionText.style.left = '';
+              elements.customVersionText.style.top = '';
+              elements.customVersionText.style.width = '';
+              elements.customVersionText.style.height = '';
+            }
+          }
+        }
+      } else if (elements.customVersionBar) {
+        elements.customVersionBar.style.display = 'none';
+      }
+      
+      // Main bar styling
+      const mainTextSample = d.text || (elements.customMainText ? elements.customMainText.textContent : '');
+      const mainFont = chooseFontAndDirection({ fontFamily: textMain.fontFamily || d.fontFamily }, mainTextSample);
+      if (mainFont.googleFamily) loadGoogleFontIfNeeded(mainFont.googleFamily);
+      else if (d && d.fontFamily) {
+        const mapped = mapFontFamilyToGoogle(d.fontFamily);
+        if (mapped) loadGoogleFontIfNeeded(mapped);
+      }
+      elements.customMainBar.style.fontFamily = mainFont.fontFamily;
+      elements.customMainBar.style.direction = mainFont.direction;
+      if (mainFont.direction === 'rtl') elements.customMainBar.style.unicodeBidi = 'plaintext';
+      elements.customMainBar.style.fontWeight = `${textMain.fontWeight != null ? textMain.fontWeight : (d.fontWeight || 700)}`;
+      elements.customMainBar.style.fontSize = `${textMain.fontSize != null ? textMain.fontSize : (d.fontSizeLT || 40)}px`;
+      elements.customMainBar.style.lineHeight = textMain.lineSpacing || 1.2;
+      elements.customMainBar.style.wordSpacing = (textMain.wordSpacing || 0) + 'px';
+      elements.customMainBar.style.letterSpacing = mainLetterSpacing + 'px';
+      elements.customMainBar.style.textTransform = mainTextTransform;
+      const mainTextColor = textMain.color || d.textColor || '#ffffff';
+      elements.customMainBar.style.color = mainTextColor;
+      elements.customMainBar.style.textAlign = mainTextAlign;
+      elements.customMainBar.style.justifyContent = mainHAlign === 'center' ? 'center' : mainHAlign === 'right' ? 'flex-end' : mainHAlign === 'justify' ? 'space-between' : 'flex-start';
+      elements.customMainBar.style.whiteSpace = mainSingleLine ? 'nowrap' : 'normal';
+      elements.customMainBar.style.alignItems = (mainVAlign === 'top') ? 'flex-start' : (mainVAlign === 'bottom') ? 'flex-end' : 'center';
+      if (elements.customMainText) {
+        elements.customMainText.style.lineHeight = textMain.lineSpacing || 1.2;
+        elements.customMainText.style.wordSpacing = (textMain.wordSpacing || 0) + 'px';
+        elements.customMainText.style.letterSpacing = mainLetterSpacing + 'px';
+        elements.customMainText.style.textTransform = mainTextTransform;
+        elements.customMainText.style.textAlign = mainTextAlign;
+        elements.customMainText.style.whiteSpace = mainSingleLine ? 'nowrap' : 'normal';
+        elements.customMainText.style.color = mainTextColor;
+        const mainTextRotation = textMain.rotation || 0;
+        const mainTextOpacity = normalizeOpacity(textMain.opacity, 1);
+        elements.customMainText.style.transform = `translate(${mainOffsetX}px, ${mainOffsetY}px) rotate(${mainTextRotation}deg)`;
+        elements.customMainText.style.opacity = mainTextOpacity;
+        elements.customMainText.style.writingMode = textMain.writingMode || 'horizontal-tb';
+        elements.customMainText.style.textOrientation = textMain.textOrientation || 'mixed';
+        if (textMain.zIndex != null) elements.customMainText.style.zIndex = textMain.zIndex;
+      }
+      const barMinWidth = mainBar.minWidth != null ? mainBar.minWidth : 0;
+      const barExtraWidth = mainBar.extraWidth != null ? mainBar.extraWidth : 0;
+      const rawBarWidth = (mainBar.width != null ? mainBar.width : viewportWidth) + barExtraWidth;
+      const finalWidth = Math.min(Math.max(barMinWidth, rawBarWidth), viewportWidth);
+      elements.customMainBar.style.display = finalWidth <= 0 ? 'none' : 'flex';
+      elements.customMainBar.style.width = `${finalWidth}px`;
+      elements.customMainBar.style.left = `${textX + barX}px`;
+      elements.customMainBar.style.right = 'auto';
+      const barPadX = (mainBar.padX != null) ? mainBar.padX : (mainBar.paddingLeft ?? mainBar.padding ?? 10);
+      const barPadY = (mainBar.padY != null) ? mainBar.padY : (mainBar.paddingBottom ?? mainBar.padding ?? 10);
+      elements.customMainBar.style.padding = `${barPadY}px ${barPadX}px`;
+      const barRotation = mainBar.rotation || 0;
+      elements.customMainBar.style.transform = `translate(0px, 0px) rotate(${barRotation}deg)`;
+      elements.customMainBar.style.transformOrigin = 'top left';
+      if (mainBar.zIndex != null) elements.customMainBar.style.zIndex = mainBar.zIndex;
+      if (finalWidth <= 0) {
+        elements.customMainBar.style.height = '0px';
+        elements.customMainBar.style.minHeight = '0px';
+        return;
+      }
+      
+      const barOpacity = normalizeOpacity(mainBar.opacity, 0.95);
+      const barFillType = mainBar.fillType || (mainBar.gradientStart || mainBar.gradientEnd ? 'gradient' : 'color');
+      const gradStart = mainBar.gradientStart || mainBar.bgColor || '#005E29';
+      const gradEnd = mainBar.gradientEnd || gradStart;
+      if (barFillType === 'gradient') {
+        // Use d.bgGradientAngle if present, otherwise default to 90
+        const angle = typeof d.bgGradientAngle !== 'undefined' ? d.bgGradientAngle : 90;
+        elements.customMainBar.style.background = `linear-gradient(${angle}deg, ${toRgba(gradStart, barOpacity)} 0%, ${toRgba(gradEnd, barOpacity)} 100%)`;
+      } else {
+        elements.customMainBar.style.background = toRgba(mainBar.bgColor || gradStart, barOpacity);
+      }
+      elements.customMainBar.style.borderColor = toRgba(mainBar.borderColor || 'transparent', barOpacity);
+      elements.customMainBar.style.borderWidth = `${mainBar.borderWidth || 0}px`;
+      elements.customMainBar.style.borderRadius = `${mainBar.borderRadius || 0}px`;
+      elements.customMainBar.style.borderStyle = 'solid';
+      
+      // Shadow
+      const mainShadow = textMain.shadow || shadow || {};
+      const shadowColor = mainShadow.color || '#000000';
+      const shadowOpacity = normalizeOpacity(mainShadow.opacity, 0.8);
+      const shadowBlur = mainShadow.blur || 8;
+      const shadowX = mainShadow.offsetX || 2;
+      const shadowY = mainShadow.offsetY != null ? mainShadow.offsetY : shadowX;
+      elements.customMainBar.style.textShadow = `${shadowX}px ${shadowY}px ${shadowBlur}px ${toRgba(shadowColor, shadowOpacity)}`;
+      if (elements.customMainText) {
+        elements.customMainText.style.textShadow = elements.customMainBar.style.textShadow;
+      }
+      
+      const baseHeight = (mainBar.height != null ? mainBar.height : (mainBar.minHeight || 220));
+      elements.customMainBar.style.minHeight = '0px';
+      elements.customMainBar.style.height = baseHeight + 'px';
+      const barTop = textY + barYOffset - baseHeight;
+      elements.customMainBar.style.top = `${barTop}px`;
+      if (elements.customMainText) {
+        const hasMainBounds = [textMain.x, textMain.y, textMain.width, textMain.height].some(v => v != null && v !== 0);
+        if (hasMainBounds) {
+          elements.customMainText.style.position = 'absolute';
+          if (textMain.x != null) elements.customMainText.style.left = `${textMain.x - (textX + barX)}px`;
+          if (textMain.y != null) elements.customMainText.style.top = `${textMain.y - barTop}px`;
+          elements.customMainText.style.width = textMain.width ? `${textMain.width}px` : 'auto';
+          elements.customMainText.style.height = textMain.height ? `${textMain.height}px` : 'auto';
+        } else {
+          elements.customMainText.style.position = '';
+          elements.customMainText.style.left = '';
+          elements.customMainText.style.top = '';
+          elements.customMainText.style.width = '';
+          elements.customMainText.style.height = '';
+        }
+      }
+      
+      // Background image for main bar
+      if (d.bgEnabled && d.bgType === 'image' && d.bgImage) {
+        elements.customMainBar.style.backgroundImage = `url(${d.bgImage})`;
+        elements.customMainBar.style.backgroundSize = 'cover';
+        elements.customMainBar.style.backgroundPosition = 'center';
+        elements.customMainBar.style.backgroundBlendMode = 'overlay';
+      }
+    }
+    
+    // Handle standard mode (non-custom)
+    function handleStandardMode(d, mode, isBible) {
+      // Hide custom elements
+      elements.customRefBox.style.display = 'none';
+      if (elements.customVersionBar) elements.customVersionBar.style.display = 'none';
+      elements.customMainBar.style.display = 'none';
+      
+      // Show text container
+      elements.txt.style.opacity = '1';
+      if (mode !== 'lt') {
+        elements.ltWrap.style.opacity = '0';
+        elements.ltWrap.style.height = '0';
+        elements.ltWrap.style.bottom = '0';
+        elements.ltWrap.style.top = 'auto';
+      }
+      
+      // Set font properties
+      const stdFont = chooseFontAndDirection(d, d.text);
+      if (stdFont.googleFamily) {
+        loadGoogleFontIfNeeded(stdFont.googleFamily);
+      } else if (d && d.fontFamily) {
+        const mapped = mapFontFamilyToGoogle(d.fontFamily);
+        if (mapped) loadGoogleFontIfNeeded(mapped);
+      }
+      elements.txt.style.fontFamily = stdFont.fontFamily;
+      elements.txt.style.direction = stdFont.direction;
+      if (stdFont.direction === 'rtl') elements.txt.style.unicodeBidi = 'plaintext';
+      if (stdFont.textAlign) elements.txt.style.textAlign = stdFont.textAlign;
+      elements.txt.style.fontSize = (mode === 'full' ? d.fontSizeFull : d.fontSizeLT) + 'pt';
+      elements.txt.style.lineHeight = (mode === 'full' ? d.lineHeightFull : (d.lineHeightLT || 1.1));
+      const effectiveTextTransform = (mode === 'full')
+        ? (!isBible ? (d.fullTextTransform || 'none') : 'none')
+        : (!isBible ? (d.ltTextTransform || 'none') : 'none');
+      elements.txt.style.textTransform = effectiveTextTransform;
+      
+      if (mode === 'full') {
+        // Full screen mode aligned by settings
+        const hAlign = d.hAlignFull || 'center';
+        const vAlign = d.vAlignFull || 'middle';
+        elements.txt.style.textAlign = (hAlign === 'justify') ? 'justify' : hAlign;
+        elements.txt.style.position = 'absolute';
+        elements.txt.style.left = '0';
+        elements.txt.style.top = '0';
+        elements.txt.style.right = '0';
+        elements.txt.style.bottom = '0';
+        elements.txt.style.width = '100%';
+        elements.txt.style.height = '100%';
+        const fullPadLR = Math.max(0, Number(d.padLRFull ?? d.padLR ?? 5));
+        elements.txt.style.padding = `0 ${fullPadLR}%`;
+        elements.txt.style.transform = 'none';
+        elements.txt.style.display = 'flex';
+        elements.txt.style.alignItems = (hAlign === 'left') ? 'flex-start' : (hAlign === 'right') ? 'flex-end' : (hAlign === 'justify' ? 'stretch' : 'center');
+        elements.txt.style.justifyContent = (vAlign === 'top') ? 'flex-start' : (vAlign === 'bottom' ? 'flex-end' : 'center');
+        elements.txt.style.flexDirection = 'column';
+        elements.txt.style.margin = '0 auto';
+      } else {
+        // Lower third mode
+        const ltAnchorMode = getLtAnchorMode(d);
+        const isTopAnchor = ltAnchorMode === 'top';
+        const hAlignLT = (d.isBible ? (d.hAlignLTBible || 'left') : (d.hAlignLT || 'center'));
+        const vAlignLT = (d.isBible ? (d.vAlignLTBible || 'middle') : (d.vAlignLT || 'middle'));
+        elements.txt.style.textAlign = (hAlignLT === 'justify') ? 'justify' : hAlignLT;
+        elements.txt.style.position = 'absolute';
+        elements.txt.style.left = '0';
+        elements.txt.style.right = '0';
+        const textY = Number(d.textY || 1080);
+        const bottomOffset = Math.max(0, window.innerHeight - textY);
+        elements.txt.style.top = isTopAnchor ? '0' : 'auto';
+        elements.txt.style.bottom = isTopAnchor ? 'auto' : `${bottomOffset}px`;
+        applyLtTextOffset(d);
+        applyLtContentWidth(d);
+        // Remove built-in side padding for Bible; keep for songs.
+        elements.txt.style.padding = isBible
+          ? (isTopAnchor ? '2vh 20px 0' : '20px')
+          : (isTopAnchor ? '2vh 8% 0' : '0 8% 2vh');
+        elements.txt.style.display = 'flex';
+        elements.txt.style.alignItems = (hAlignLT === 'left') ? 'flex-start' : (hAlignLT === 'right') ? 'flex-end' : (hAlignLT === 'justify' ? 'stretch' : 'center');
+        elements.txt.style.justifyContent = (vAlignLT === 'top') ? 'flex-start' : (vAlignLT === 'bottom' ? 'flex-end' : 'center');
+        elements.txt.style.flexDirection = 'column';
+
+        // For Bible LT remove any inline background color on the reference line so it's transparent
+        if (isBible) {
+          const refEls = elements.txt.querySelectorAll('.jo-ref-line');
+          refEls.forEach(refEl => {
+            refEl.style.background = 'transparent';
+            refEl.style.boxShadow = 'none';
+            refEl.style.alignSelf = (hAlignLT === 'left') ? 'flex-start' : (hAlignLT === 'right') ? 'flex-end' : (hAlignLT === 'justify' ? 'stretch' : 'center');
+            refEl.style.textAlign = (hAlignLT === 'justify') ? 'justify' : hAlignLT;
+          });
+          const verseAlign = d.hAlignLTBibleVerse || hAlignLT;
+          const bodyEls = elements.txt.querySelectorAll('.jo-body');
+          bodyEls.forEach(bodyEl => {
+            bodyEl.style.textAlign = (verseAlign === 'justify') ? 'justify' : verseAlign;
+            bodyEl.style.alignSelf = (verseAlign === 'left') ? 'flex-start' : (verseAlign === 'right') ? 'flex-end' : (verseAlign === 'justify' ? 'stretch' : 'center');
+          });
+        }
+      }
+    }
+
+    function isGifSource(src) {
+      if (!src) return false;
+      const raw = String(src).trim().toLowerCase();
+      if (raw.startsWith('data:image/gif')) return true;
+      const clean = raw.split('?')[0].split('#')[0];
+      return clean.endsWith('.gif');
+    }
+
+    function normalizeUrlInput(raw) {
+      const text = String(raw || '').trim();
+      if (!text) return '';
+      if (/^https?:\/\//i.test(text)) return text;
+      return `https://${text}`;
+    }
+
+    function parseTimeToSeconds(value) {
+      if (!value) return null;
+      const raw = String(value).trim();
+      if (/^\d+$/.test(raw)) return parseInt(raw, 10);
+      const match = raw.match(/(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/i);
+      if (!match) return null;
+      const hours = parseInt(match[1] || '0', 10);
+      const minutes = parseInt(match[2] || '0', 10);
+      const seconds = parseInt(match[3] || '0', 10);
+      const total = (hours * 3600) + (minutes * 60) + seconds;
+      return total > 0 ? total : null;
+    }
+
+    function getYouTubeInfo(url) {
+      const raw = String(url || '').trim();
+      if (!raw) return null;
+      try {
+        const u = new URL(normalizeUrlInput(raw));
+        const host = u.hostname.replace(/^www\./, '').toLowerCase();
+        let id = null;
+        if (host === 'youtu.be') {
+          id = u.pathname.split('/').filter(Boolean)[0] || null;
+        } else if (host.endsWith('youtube.com') || host.endsWith('youtube-nocookie.com')) {
+          if (u.pathname === '/watch') id = u.searchParams.get('v');
+          else if (u.pathname.startsWith('/embed/')) id = u.pathname.split('/')[2];
+          else if (u.pathname.startsWith('/shorts/')) id = u.pathname.split('/')[2];
+          else if (u.pathname.startsWith('/live/')) id = u.pathname.split('/')[2];
+        }
+        if (!id) return null;
+        const startParam = u.searchParams.get('t') || u.searchParams.get('start');
+        const start = parseTimeToSeconds(startParam);
+        return { id, start };
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function buildYouTubeEmbedUrl(info, loop) {
+      if (!info || !info.id) return '';
+      const params = new URLSearchParams();
+      params.set('autoplay', '1');
+      params.set('mute', '1');
+      params.set('controls', '0');
+      params.set('modestbranding', '1');
+      params.set('rel', '0');
+      params.set('playsinline', '1');
+      params.set('fs', '0');
+      params.set('disablekb', '1');
+      params.set('iv_load_policy', '3');
+      if (loop) {
+        params.set('loop', '1');
+        params.set('playlist', info.id);
+      }
+      if (info.start != null) params.set('start', String(info.start));
+      return `https://www.youtube.com/embed/${info.id}?${params.toString()}`;
+    }
+
+    function sizeYoutubeFrame(container, frame) {
+      if (!container || !frame) return;
+      const rect = container.getBoundingClientRect();
+      const width = rect.width || 0;
+      const height = rect.height || 0;
+      if (!width || !height) return;
+      const aspect = 16 / 9;
+      let frameWidth = width;
+      let frameHeight = width / aspect;
+      if (frameHeight < height) {
+        frameHeight = height;
+        frameWidth = height * aspect;
+      }
+      frame.style.width = `${Math.ceil(frameWidth)}px`;
+      frame.style.height = `${Math.ceil(frameHeight)}px`;
+    }
+
+    function syncYoutubeState(wrapperEl, frameEl, src, shouldShow) {
+      if (!wrapperEl || !frameEl) return;
+      const nextSrc = src || '';
+      const prevSrc = frameEl.dataset.src || '';
+      const show = !!(shouldShow && nextSrc);
+      if (show && nextSrc && nextSrc !== prevSrc) {
+        frameEl.dataset.src = nextSrc;
+        frameEl.src = nextSrc;
+      } else if (!show && prevSrc) {
+        frameEl.removeAttribute('src');
+        frameEl.dataset.src = '';
+      }
+      wrapperEl.style.display = show ? 'block' : 'none';
+      wrapperEl.style.opacity = show ? '1' : '0';
+      if (show) sizeYoutubeFrame(wrapperEl, frameEl);
+    }
+
+    function resizeYoutubeFrames() {
+      sizeYoutubeFrame(elements.bgYoutube, elements.bgYoutubeFrame);
+      sizeYoutubeFrame(elements.ltYoutube, elements.ltYoutubeFrame);
+    }
+
+    function normalizeVideoSpeed(value) {
+      const num = parseFloat(value);
+      if (!Number.isFinite(num)) return 1;
+      return clamp(num, 0.25, 4);
+    }
+
+    const seamlessLoopControllers = new WeakMap();
+    function hideVideoElement(videoEl, clearSrc = false) {
+      if (!videoEl) return;
+      videoEl.style.display = 'none';
+      videoEl.style.opacity = '0';
+      videoEl.style.transition = '';
+      if (!videoEl.paused) videoEl.pause();
+      if (clearSrc) {
+        videoEl.removeAttribute('src');
+        videoEl.load();
+      }
+    }
+
+    function getSeamlessLoopController(primaryEl) {
+      if (!primaryEl || !primaryEl.parentElement) return null;
+      let controller = seamlessLoopControllers.get(primaryEl);
+      if (controller) return controller;
+      const secondaryEl = document.createElement('video');
+      secondaryEl.className = primaryEl.className;
+      secondaryEl.muted = true;
+      secondaryEl.playsInline = true;
+      secondaryEl.preload = 'auto';
+      secondaryEl.setAttribute('aria-hidden', 'true');
+      secondaryEl.style.display = 'none';
+      secondaryEl.style.opacity = '0';
+      secondaryEl.style.pointerEvents = 'none';
+      primaryEl.insertAdjacentElement('afterend', secondaryEl);
+      controller = {
+        primary: primaryEl,
+        secondary: secondaryEl,
+        active: primaryEl,
+        inactive: secondaryEl,
+        rafId: 0,
+        swapping: false,
+        enabled: false,
+        src: '',
+        playbackRate: 1
+      };
+      seamlessLoopControllers.set(primaryEl, controller);
+      return controller;
+    }
+
+    function stopSeamlessLoop(controller, opts = {}) {
+      if (!controller) return;
+      controller.enabled = false;
+      controller.swapping = false;
+      if (controller.rafId) {
+        cancelAnimationFrame(controller.rafId);
+        controller.rafId = 0;
+      }
+      hideVideoElement(controller.secondary, !!opts.clearSrc);
+      if (opts.resetActiveToPrimary) {
+        controller.active = controller.primary;
+        controller.inactive = controller.secondary;
+      }
+      if (opts.clearSrc) controller.src = '';
+    }
+
+    function startSeamlessLoopMonitor(controller) {
+      if (!controller || controller.rafId) return;
+      const fadeMs = 120;
+      const onFrame = () => {
+        if (!controller.enabled) {
+          controller.rafId = 0;
+          return;
+        }
+        const active = controller.active;
+        const inactive = controller.inactive;
+        if (!controller.swapping && active && !active.paused) {
+          const duration = Number(active.duration || 0);
+          const current = Number(active.currentTime || 0);
+          if (Number.isFinite(duration) && duration > 0.4) {
+            const remaining = duration - current;
+            if (remaining <= 0.16) {
+              controller.swapping = true;
+              inactive.currentTime = 0.001;
+              inactive.playbackRate = controller.playbackRate;
+              inactive.loop = false;
+              inactive.style.display = 'block';
+              inactive.style.opacity = '0';
+              inactive.style.transition = `opacity ${fadeMs}ms linear`;
+              active.style.transition = `opacity ${fadeMs}ms linear`;
+              const p = inactive.play();
+              if (p && p.catch) p.catch(() => {});
+              requestAnimationFrame(() => {
+                inactive.style.opacity = `${revealOpacity}`;
+                active.style.opacity = '0';
+              });
+              setTimeout(() => {
+                hideVideoElement(active, false);
+                inactive.style.transition = '';
+                controller.active = inactive;
+                controller.inactive = active;
+                controller.swapping = false;
+              }, fadeMs + 40);
+            }
+          }
+        }
+        controller.rafId = requestAnimationFrame(onFrame);
+      };
+      controller.rafId = requestAnimationFrame(onFrame);
+    }
+
+    function syncVideoState(videoEl, src, shouldPlay, options = {}) {
+      if (!videoEl) return;
+      const loop = options.loop !== undefined ? !!options.loop : true;
+      const playbackRate = normalizeVideoSpeed(options.playbackRate);
+      const revealOpacity = clamp(Number(options.revealOpacity ?? 1), 0, 1);
+      const nextSrc = src || '';
+      const prevSrc = videoEl.dataset.src || '';
+      const srcChanged = nextSrc && nextSrc !== prevSrc;
+      const wantsFadeOut = !!options.fadeOut;
+      const loopController = getSeamlessLoopController(videoEl);
+      if (loopController && (!loop || !nextSrc || !shouldPlay || srcChanged)) {
+        stopSeamlessLoop(loopController, { clearSrc: !nextSrc && !wantsFadeOut, resetActiveToPrimary: true });
+      }
+      if (srcChanged) {
+        videoEl.dataset.src = nextSrc;
+        videoEl.src = nextSrc;
+        videoEl.load();
+        if (loopController) {
+          loopController.secondary.src = nextSrc;
+          loopController.secondary.load();
+          loopController.src = nextSrc;
+        }
+      } else if (!nextSrc && prevSrc && !wantsFadeOut) {
+        // Only remove source immediately if not fading out
+        videoEl.removeAttribute('src');
+        videoEl.dataset.src = '';
+        videoEl.load();
+      }
+      const show = !!(shouldPlay && nextSrc);
+      videoEl.loop = loop && !loopController;
+      videoEl.playbackRate = playbackRate;
+      if (loopController) {
+        loopController.playbackRate = playbackRate;
+      }
+
+      if (show && loop && loopController) {
+        const active = loopController.active || videoEl;
+        const inactive = loopController.inactive || loopController.secondary;
+        loopController.enabled = true;
+        active.loop = false;
+        inactive.loop = false;
+        active.playbackRate = playbackRate;
+        inactive.playbackRate = playbackRate;
+        active.muted = true;
+        inactive.muted = true;
+        active.playsInline = true;
+        inactive.playsInline = true;
+        hideVideoElement(inactive, false);
+        if (srcChanged || active.readyState < 2) {
+          active.style.display = 'block';
+          active.style.opacity = '0';
+          const reveal = () => {
+            active.style.transition = 'opacity 0.24s cubic-bezier(0.4, 0, 0.2, 1)';
+            active.style.opacity = `${revealOpacity}`;
+            setTimeout(() => { active.style.transition = ''; }, 280);
+          };
+          if (active.readyState >= 2) reveal();
+          else {
+            active.addEventListener('canplay', function onCanPlay() {
+              active.removeEventListener('canplay', onCanPlay);
+              reveal();
+            });
+          }
+        } else {
+          active.style.display = 'block';
+          active.style.opacity = `${revealOpacity}`;
+        }
+        const p = active.play();
+        if (p && p.catch) p.catch(() => {});
+        startSeamlessLoopMonitor(loopController);
+        return;
+      }
+
+      if (show) {
+        videoEl.muted = true;
+        videoEl.playsInline = true;
+        // If video needs to load, wait until ready before revealing
+        if (srcChanged || videoEl.readyState < 2) {
+          videoEl.style.display = 'block';
+          videoEl.style.opacity = '0';
+          const reveal = () => {
+            videoEl.style.transition = 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            videoEl.style.opacity = `${revealOpacity}`;
+            // Clean up transition after it completes
+            setTimeout(() => { videoEl.style.transition = ''; }, 450);
+          };
+          if (videoEl.readyState >= 2) {
+            // Already buffered enough
+            reveal();
+          } else {
+            videoEl.addEventListener('canplay', function onCanPlay() {
+              videoEl.removeEventListener('canplay', onCanPlay);
+              reveal();
+            });
+          }
+          const p = videoEl.play();
+          if (p && p.catch) p.catch(() => {});
+        } else {
+          // Already loaded and showing — just ensure visible
+          videoEl.style.display = 'block';
+          videoEl.style.opacity = `${revealOpacity}`;
+          const p = videoEl.play();
+          if (p && p.catch) p.catch(() => {});
+        }
+      } else if (options.fadeOut && (videoEl.style.opacity !== '0' || (loopController && loopController.active && loopController.active.style.opacity !== '0')) && videoEl.style.display !== 'none') {
+        // Fade video out smoothly before hiding
+        videoEl.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        videoEl.style.opacity = '0';
+        if (loopController && loopController.active) {
+          loopController.active.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+          loopController.active.style.opacity = '0';
+          if (loopController.inactive) hideVideoElement(loopController.inactive, false);
+        }
+        setTimeout(() => {
+          videoEl.style.transition = '';
+          videoEl.style.display = 'none';
+          if (!videoEl.paused) videoEl.pause();
+          if (loopController) stopSeamlessLoop(loopController, { clearSrc: !nextSrc, resetActiveToPrimary: true });
+          if (!nextSrc && videoEl.dataset.src) {
+            videoEl.removeAttribute('src');
+            videoEl.dataset.src = '';
+            videoEl.load();
+          }
+        }, 550);
+      } else {
+        videoEl.style.display = 'none';
+        videoEl.style.opacity = '0';
+        if (!videoEl.paused) {
+          videoEl.pause();
+        }
+        if (loopController) stopSeamlessLoop(loopController, { clearSrc: false, resetActiveToPrimary: true });
+      }
+    }
+    
+    // Handle background with proper positioning for Bible LT mode
+    // ===== BACKGROUND =====
+    function handleBackground(d, mode, isBible) {
+      const bgOpacity = clamp(Number(d.bgOpacity ?? 1), 0, 1);
+      const blurPx = clamp(Number(d.bgBlur || 0), 0, 40);
+      const bgY = clamp(Number(d.bgY || 0), -50, 50);
+      const isFade = (currentState.transitionType || '').toLowerCase() === 'fade';
+      const isGifVideo = (d.bgType === 'video' && !!d.bgVideo && isGifSource(d.bgVideo));
+      const youtubeInfo = (d.bgType === 'video' && !!d.bgVideo) ? getYouTubeInfo(d.bgVideo) : null;
+      const bgYoutubeSrc = youtubeInfo ? buildYouTubeEmbedUrl(youtubeInfo, d.bgVideoLoop !== false) : null;
+      const bgVideoSrc = (d.bgType === 'video' && !!d.bgVideo && !isGifVideo && !bgYoutubeSrc) ? d.bgVideo : null;
+      const bgGifSrc = (d.bgType === 'video' && !!d.bgVideo && isGifVideo) ? d.bgVideo : null;
+      const videoSettings = {
+        loop: d.bgVideoLoop !== false,
+        playbackRate: normalizeVideoSpeed(d.bgVideoSpeed ?? 1)
+      };
+      const bgMediaPresent = d.bgType === 'image' ? !!d.bgImage : (d.bgType === 'video' ? !!d.bgVideo : true);
+      const bgCurrentlyActive = d.bgEnabled && bgOpacity > 0 && bgMediaPresent && (mode === 'full');
+      const ltCurrentlyActive = d.bgEnabled && bgOpacity > 0 && bgMediaPresent && (mode === 'lt');
+      const customCurrentlyActive = d.bgEnabled && (mode === 'custom');
+      const suppressBgTransition = (!animateBgTransitions) && (isFade ? (bgActivePrev && bgCurrentlyActive) : true);
+      const suppressLtTransition = (!animateBgTransitions) && (isFade ? (ltBgActivePrev && ltCurrentlyActive) : true);
+      const suppressCustomBgTransition = (!animateBgTransitions) && (isFade ? (prevBgState.custom && customCurrentlyActive) : true);
+      
+      const requestedBgMode = (typeof d.bgMode === 'string') ? d.bgMode : 'solid';
+      const bgModeChanged = requestedBgMode !== lastBGMode;
+      const requestedBgType = d.bgType || 'color';
+      const bgTypeChanged = requestedBgType !== lastBgType;
+
+      const applyTransitionState = (el, suppress) => {
+        if (!el) return;
+        if (suppress) el.style.transition = 'none';
+        else el.style.transition = '';
+      };
+      const edgeFixScale = (d.bgEdgeFix && blurPx > 0) ? Math.min(1.4, 1 + (blurPx / 32)) : 1;
+      const ltBgTransform = `scale(${edgeFixScale})`;
+      const fullBgTransform = `scale(${edgeFixScale})`;
+      const bgPositionY = `${50 + bgY}%`;
+      elements.ltInner.style.transform = ltBgTransform;
+      elements.ltCrossfade.style.transform = ltBgTransform;
+      elements.ltInner.style.transformOrigin = 'center center';
+      elements.ltCrossfade.style.transformOrigin = 'center center';
+      elements.ltInner.style.backgroundPosition = `center ${bgPositionY}`;
+      elements.ltCrossfade.style.backgroundPosition = `center ${bgPositionY}`;
+      elements.bg.style.transform = fullBgTransform;
+      elements.bgCrossfade.style.transform = fullBgTransform;
+      elements.bg.style.transformOrigin = 'center center';
+      elements.bgCrossfade.style.transformOrigin = 'center center';
+      elements.bg.style.backgroundPosition = `center ${bgPositionY}`;
+      elements.bgCrossfade.style.backgroundPosition = `center ${bgPositionY}`;
+      if (elements.ltVideo) elements.ltVideo.style.objectPosition = `center ${bgPositionY}`;
+      if (elements.bgVideo) elements.bgVideo.style.objectPosition = `center ${bgPositionY}`;
+      
+      if (mode === 'lt' || mode === 'custom') {
+        applyTransitionState(elements.bg, suppressBgTransition);
+        elements.bg.style.opacity = '0';
+        syncVideoState(elements.bgVideo, bgVideoSrc, false, videoSettings);
+        syncYoutubeState(elements.bgYoutube, elements.bgYoutubeFrame, bgYoutubeSrc, false);
+        
+        if (mode === 'lt') {
+          const ltAnchorMode = getLtAnchorMode(d);
+          const isTopAnchor = ltAnchorMode === 'top';
+          applyTransitionState(elements.ltWrap, suppressLtTransition);
+          applyLtContentWidth(d);
+          applyLtBandOffset(d);
+          applyLtBorderRadius(d);
+          const ltHeight = computeLtHeight(d);
+          elements.ltWrap.style.height = `${ltHeight}vh`;
+          applyLtAnchorMode(ltAnchorMode);
+          const textY = Number(d.textY || 1080);
+          const bottomOffset = Math.max(0, window.innerHeight - textY);
+          elements.txt.style.top = isTopAnchor ? '0' : 'auto';
+          elements.txt.style.bottom = isTopAnchor ? 'auto' : `${bottomOffset}px`;
+          applyLtTextOffset(d);
+
+          const ltBgModeRequested = (typeof d.bgMode === 'string') ? d.bgMode : 'solid';
+          const ltBgModeChanged = ltBgModeRequested !== lastLtBgMode;
+          const ltBgTypeRequested = d.bgType || 'color';
+          const ltBgTypeChanged = ltBgTypeRequested !== lastLtBgType;
+          
+          if (isBible) {
+            applyBibleLtLayout(d, ltHeight, ltAnchorMode);
+          } else {
+            // Song LT mode
+            const vAlignLT = d.vAlignLT || 'middle';
+            const sidePad = `${d.padLRLT || d.padLR || 5}%`;
+            elements.txt.style.alignItems = 'center';
+            applyLtAnchorMode(ltAnchorMode);
+            applySongLtVerticalLayout(d, ltHeight, sidePad, vAlignLT, ltAnchorMode);
+          }
+          elements.txt.style.zIndex = '4';
+          elements.ltWrap.style.zIndex = '-2';
+          
+          // Apply background effects
+          if (d.bgEnabled) {
+            elements.ltWrap.style.opacity = bgOpacity;
+            elements.ltInner.style.filter = `blur(${blurPx}px)`;
+            syncVideoState(elements.ltVideo, bgVideoSrc, (d.bgType === 'video' && !!bgVideoSrc), { ...videoSettings, fadeOut: (lastLtBgType === 'video' && d.bgType !== 'video'), revealOpacity: bgOpacity });
+            syncYoutubeState(elements.ltYoutube, elements.ltYoutubeFrame, bgYoutubeSrc, (d.bgType === 'video' && !!bgYoutubeSrc));
+            
+            const applyLtBackground = () => {
+              if (bgVideoSrc) {
+                elements.ltInner.style.backgroundImage = 'none';
+                elements.ltInner.style.backgroundColor = 'transparent';
+              } else if (bgGifSrc) {
+                elements.ltInner.style.backgroundImage = `url(${bgGifSrc})`;
+                elements.ltInner.style.backgroundColor = 'transparent';
+              } else if (bgYoutubeSrc) {
+                elements.ltInner.style.backgroundImage = 'none';
+                elements.ltInner.style.backgroundColor = 'transparent';
+              } else if (d.bgType === 'image' && d.bgImage) {
+                elements.ltInner.style.backgroundImage = `url(${d.bgImage})`;
+                elements.ltInner.style.backgroundColor = 'transparent';
+              } else {
+                const gradStart = d.bgGradientShadow || d.bgColor || 'black';
+                const gradEnd = d.bgGradientHighlight || d.bgColor || 'black';
+                if (d.bgMode === 'gradient') {
+                  const angle = typeof d.bgGradientAngle !== 'undefined' ? d.bgGradientAngle : 90;
+                  elements.ltInner.style.backgroundImage = `linear-gradient(${angle}deg, ${gradStart} 0%, ${gradEnd} 100%)`;
+                  elements.ltInner.style.backgroundColor = gradStart;
+                } else {
+                  elements.ltInner.style.backgroundImage = 'none';
+                  elements.ltInner.style.backgroundColor = d.bgColor || 'black';
+                }
+              }
+            };
+
+            const shouldLtFade = (ltBgModeChanged || ltBgTypeChanged) && ltCurrentlyActive && prevBgState.lt && !bgVideoSrc && !bgGifSrc && !bgYoutubeSrc;
+            const shouldLtFadeIn = ltCurrentlyActive && !prevBgState.lt && !bgVideoSrc && !bgYoutubeSrc;
+            const shouldLtFadeFromVideo = ltBgTypeChanged && ltCurrentlyActive && prevBgState.lt && !bgVideoSrc && !bgGifSrc && !bgYoutubeSrc && lastLtBgType === 'video';
+            const shouldLtFadeToVideo = ltBgTypeChanged && ltCurrentlyActive && prevBgState.lt && (!!bgVideoSrc || !!bgGifSrc) && lastLtBgType !== 'video';
+            if (shouldLtFadeFromVideo) {
+              // Video fades out via syncVideoState fadeOut option — just apply new bg underneath
+              applyLtBackground();
+              elements.ltInner.style.opacity = `${bgOpacity}`;
+            } else if (shouldLtFadeIn) {
+              const lcf = elements.ltCrossfade;
+              lcf.style.transition = 'none';
+              applyLtBackground();
+              const nextLtBgImage = elements.ltInner.style.backgroundImage;
+              const nextLtBgColor = elements.ltInner.style.backgroundColor;
+              elements.ltInner.style.opacity = '0';
+              lcf.style.backgroundImage = nextLtBgImage;
+              lcf.style.backgroundColor = nextLtBgColor;
+              lcf.style.filter = elements.ltInner.style.filter || '';
+              lcf.style.opacity = '0';
+              elements.ltWrap.style.opacity = `${bgOpacity}`;
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  lcf.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                  lcf.style.opacity = `${bgOpacity}`;
+                  setTimeout(() => {
+                    elements.ltInner.style.opacity = `${bgOpacity}`;
+                    lcf.style.transition = 'none';
+                    lcf.style.opacity = '0';
+                  }, 520);
+                });
+              });
+            } else if (shouldLtFade) {
+              // Crossfade dissolve: show old bg on overlay, apply new bg underneath, fade overlay out
+              const lcf = elements.ltCrossfade;
+              lcf.style.transition = 'none';
+              lcf.style.backgroundImage = lastLtBgStyle.backgroundImage;
+              lcf.style.backgroundColor = lastLtBgStyle.backgroundColor;
+              lcf.style.filter = elements.ltInner.style.filter || '';
+              lcf.style.opacity = `${bgOpacity}`;
+              // Apply new background to main layer immediately (hidden behind overlay)
+              applyLtBackground();
+              elements.ltInner.style.opacity = `${bgOpacity}`;
+              // Force paint of overlay with old bg, then fade it out
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  lcf.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                  lcf.style.opacity = '0';
+                });
+              });
+            } else if (shouldLtFadeToVideo) {
+              // Hold old background on crossfade overlay until video is ready
+              const lcf = elements.ltCrossfade;
+              lcf.style.transition = 'none';
+              lcf.style.backgroundImage = lastLtBgStyle.backgroundImage;
+              lcf.style.backgroundColor = lastLtBgStyle.backgroundColor;
+              lcf.style.filter = elements.ltInner.style.filter || '';
+              lcf.style.opacity = `${bgOpacity}`;
+              applyLtBackground();
+              elements.ltInner.style.opacity = `${bgOpacity}`;
+              const targetVideo = bgVideoSrc ? elements.ltVideo : null;
+              const fadeOutOverlay = () => {
+                requestAnimationFrame(() => {
+                  lcf.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                  lcf.style.opacity = '0';
+                });
+              };
+              if (targetVideo && targetVideo.readyState < 2) {
+                targetVideo.addEventListener('canplay', function onReady() {
+                  targetVideo.removeEventListener('canplay', onReady);
+                  fadeOutOverlay();
+                });
+                setTimeout(fadeOutOverlay, 3000);
+              } else {
+                requestAnimationFrame(() => {
+                  requestAnimationFrame(() => {
+                    lcf.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                    lcf.style.opacity = '0';
+                  });
+                });
+              }
+            } else {
+              applyLtBackground();
+              elements.ltInner.style.opacity = `${bgOpacity}`;
+            }
+            // Store current lt bg style for next crossfade
+            lastLtBgStyle = {
+              backgroundImage: elements.ltInner.style.backgroundImage,
+              backgroundColor: elements.ltInner.style.backgroundColor
+            };
+          } else {
+            elements.ltWrap.style.opacity = '0';
+            elements.ltInner.style.opacity = '0';
+            syncVideoState(elements.ltVideo, bgVideoSrc, false, videoSettings);
+            syncYoutubeState(elements.ltYoutube, elements.ltYoutubeFrame, bgYoutubeSrc, false);
+          }
+          lastLtBgMode = ltBgModeRequested;
+          lastLtBgType = ltBgTypeRequested;
+        } else {
+          // Custom mode background
+          applyTransitionState(elements.ltWrap, suppressCustomBgTransition);
+          elements.ltWrap.style.opacity = '0';
+          elements.ltWrap.style.height = '0';
+          elements.ltInner.style.backgroundImage = 'none';
+          elements.ltInner.style.backgroundColor = 'transparent';
+          syncVideoState(elements.ltVideo, bgVideoSrc, false, videoSettings);
+          syncYoutubeState(elements.ltYoutube, elements.ltYoutubeFrame, bgYoutubeSrc, false);
+        }
+      } else {
+        // Full screen mode
+        applyTransitionState(elements.bg, suppressBgTransition);
+        elements.txt.style.padding = `0 ${Math.max(0, Number(d.padLRFull ?? d.padLR ?? 5))}%`;
+        elements.txt.style.maxWidth = '100%';
+        elements.txt.style.width = '100%';
+        elements.ltWrap.style.opacity = '0';
+        elements.customRefBox.style.display = 'none';
+        if (elements.customVersionBar) elements.customVersionBar.style.display = 'none';
+        elements.customMainBar.style.display = 'none';
+        
+        if (d.bgEnabled) {
+          elements.bg.style.filter = `blur(${blurPx}px)`;
+          syncVideoState(elements.bgVideo, bgVideoSrc, (d.bgType === 'video' && !!bgVideoSrc), { ...videoSettings, fadeOut: (lastBgType === 'video' && d.bgType !== 'video'), revealOpacity: bgOpacity });
+          syncYoutubeState(elements.bgYoutube, elements.bgYoutubeFrame, bgYoutubeSrc, (d.bgType === 'video' && !!bgYoutubeSrc));
+
+          const applyFullBackground = () => {
+            if (bgVideoSrc) {
+              elements.bg.style.backgroundImage = 'none';
+              elements.bg.style.backgroundColor = 'transparent';
+            } else if (bgGifSrc) {
+              elements.bg.style.backgroundImage = `url(${bgGifSrc})`;
+              elements.bg.style.backgroundColor = 'transparent';
+            } else if (bgYoutubeSrc) {
+              elements.bg.style.backgroundImage = 'none';
+              elements.bg.style.backgroundColor = 'transparent';
+            } else if (d.bgType === 'image' && d.bgImage) {
+              elements.bg.style.backgroundImage = `url(${d.bgImage})`;
+              elements.bg.style.backgroundColor = 'transparent';
+            } else {
+              const gradStart = d.bgGradientShadow || d.bgColor || 'black';
+              const gradEnd = d.bgGradientHighlight || d.bgColor || 'black';
+              if (d.bgMode === 'gradient') {
+                const angle = typeof d.bgGradientAngle !== 'undefined' ? d.bgGradientAngle : 90;
+                elements.bg.style.backgroundImage = `linear-gradient(${angle}deg, ${gradStart} 0%, ${gradEnd} 100%)`;
+                elements.bg.style.backgroundColor = gradStart;
+              } else {
+                elements.bg.style.backgroundImage = 'none';
+                elements.bg.style.backgroundColor = d.bgColor || 'black';
+              }
+            }
+          };
+
+          const shouldFade = (bgModeChanged || bgTypeChanged) && bgCurrentlyActive && prevBgState.full && !bgVideoSrc && !bgGifSrc && !bgYoutubeSrc;
+          const shouldFadeIn = bgCurrentlyActive && !prevBgState.full && !bgVideoSrc && !bgYoutubeSrc;
+          const shouldFadeFromVideo = bgTypeChanged && bgCurrentlyActive && prevBgState.full && !bgVideoSrc && !bgGifSrc && !bgYoutubeSrc && lastBgType === 'video';
+          const shouldFadeToVideo = bgTypeChanged && bgCurrentlyActive && prevBgState.full && (!!bgVideoSrc || !!bgGifSrc) && lastBgType !== 'video';
+          if (shouldFadeFromVideo) {
+            // Video fades out via syncVideoState fadeOut option — just apply new bg underneath
+            applyFullBackground();
+            elements.bg.style.opacity = `${bgOpacity}`;
+          } else if (shouldFadeIn) {
+            const cf = elements.bgCrossfade;
+            cf.style.transition = 'none';
+            applyFullBackground();
+            const nextBgImage = elements.bg.style.backgroundImage;
+            const nextBgColor = elements.bg.style.backgroundColor;
+            elements.bg.style.opacity = '0';
+            cf.style.backgroundImage = nextBgImage;
+            cf.style.backgroundColor = nextBgColor;
+            cf.style.filter = elements.bg.style.filter || '';
+            cf.style.opacity = '0';
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                cf.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                cf.style.opacity = `${bgOpacity}`;
+                setTimeout(() => {
+                  elements.bg.style.opacity = `${bgOpacity}`;
+                  cf.style.transition = 'none';
+                  cf.style.opacity = '0';
+                }, 520);
+              });
+            });
+          } else if (shouldFade) {
+            // Crossfade dissolve: show old bg on overlay, apply new bg underneath, fade overlay out
+            const cf = elements.bgCrossfade;
+            cf.style.transition = 'none';
+            cf.style.backgroundImage = lastFullBgStyle.backgroundImage;
+            cf.style.backgroundColor = lastFullBgStyle.backgroundColor;
+            cf.style.filter = elements.bg.style.filter || '';
+            cf.style.opacity = `${bgOpacity}`;
+            // Apply new background to main layer immediately (hidden behind overlay)
+            applyFullBackground();
+            elements.bg.style.opacity = `${bgOpacity}`;
+            // Force paint of overlay with old bg, then fade it out
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                cf.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                cf.style.opacity = '0';
+              });
+            });
+          } else if (shouldFadeToVideo) {
+            // Hold old background on crossfade overlay until video is ready
+            const cf = elements.bgCrossfade;
+            cf.style.transition = 'none';
+            cf.style.backgroundImage = lastFullBgStyle.backgroundImage;
+            cf.style.backgroundColor = lastFullBgStyle.backgroundColor;
+            cf.style.filter = elements.bg.style.filter || '';
+            cf.style.opacity = `${bgOpacity}`;
+            applyFullBackground();
+            elements.bg.style.opacity = `${bgOpacity}`;
+            // Fade out overlay once video element is visible (canplay fired)
+            const targetVideo = bgVideoSrc ? elements.bgVideo : null;
+            const fadeOutOverlay = () => {
+              requestAnimationFrame(() => {
+                cf.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                cf.style.opacity = '0';
+              });
+            };
+            if (targetVideo && targetVideo.readyState < 2) {
+              targetVideo.addEventListener('canplay', function onReady() {
+                targetVideo.removeEventListener('canplay', onReady);
+                fadeOutOverlay();
+              });
+              // Safety timeout — don't hold overlay forever
+              setTimeout(fadeOutOverlay, 3000);
+            } else {
+              // Already ready or gif — just dissolve
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  cf.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                  cf.style.opacity = '0';
+                });
+              });
+            }
+          } else {
+            applyFullBackground();
+            elements.bg.style.opacity = `${bgOpacity}`;
+          }
+          // Store current bg style for next crossfade
+          lastFullBgStyle = {
+            backgroundImage: elements.bg.style.backgroundImage,
+            backgroundColor: elements.bg.style.backgroundColor
+          };
+        } else {
+          elements.bg.style.opacity = '0';
+          syncVideoState(elements.bgVideo, bgVideoSrc, false, videoSettings);
+          syncYoutubeState(elements.bgYoutube, elements.bgYoutubeFrame, bgYoutubeSrc, false);
+        }
+      }
+      
+      // Force reflow to ensure proper rendering
+      lastBGMode = requestedBgMode;
+      lastBgType = requestedBgType;
+      requestAnimationFrame(() => {
+        if (suppressBgTransition) elements.bg.style.transition = '';
+        if (suppressLtTransition) elements.ltWrap.style.transition = '';
+        if (suppressCustomBgTransition) elements.ltWrap.style.transition = '';
+        if (mode === 'lt' && d.bgEnabled) {
+          const ltAnchorMode = getLtAnchorMode(d);
+          const isTopAnchor = ltAnchorMode === 'top';
+          const ltOffsetY = getLtOffsetY(d);
+          elements.ltWrap.style.opacity = bgOpacity;
+
+          // Recompute LT height (auto-resize by line count) and centering after layout so measurements are accurate
+          applyLtBandOffset(d);
+          applyLtBorderRadius(d);
+          const ltHeight = computeLtHeight(d);
+          elements.ltWrap.style.height = `${ltHeight}vh`;
+          applyLtAnchorMode(ltAnchorMode);
+
+          if (!isBible) {
+            applyLtTextOffset(d);
+            const sidePad = `${d.padLRLT || d.padLR || 5}%`;
+            const vAlignLT = d.vAlignLT || 'middle';
+            applySongLtVerticalLayout(d, ltHeight, sidePad, vAlignLT, ltAnchorMode);
+          } else {
+            applyBibleLtLayout(d, ltHeight, ltAnchorMode);
+          }
+        } else if (mode === 'lt' && !d.bgEnabled && isBible) {
+          const ltAnchorMode = getLtAnchorMode(d);
+          const ltHeight = computeLtHeight(d);
+          applyLtAnchorMode(ltAnchorMode);
+          applyBibleLtLayout(d, ltHeight, ltAnchorMode);
+        } else if (mode === 'lt' && !d.bgEnabled && !isBible) {
+          const ltAnchorMode = getLtAnchorMode(d);
+          const ltHeight = computeLtHeight(d);
+          const sidePad = `${d.padLRLT || d.padLR || 5}%`;
+          const vAlignLT = d.vAlignLT || 'middle';
+          applySongLtVerticalLayout(d, ltHeight, sidePad, vAlignLT, ltAnchorMode);
+        }
+        if (mode === 'full' && d.bgEnabled) {
+          elements.bg.style.opacity = bgOpacity;
+        }
+      });
+      
+      bgActivePrev = bgCurrentlyActive;
+      ltBgActivePrev = ltCurrentlyActive;
+      customBgActivePrev = (mode === 'custom' && d.bgEnabled);
+    }
+    
+    // Clear display
+    function finalizeClear() {
+      if (clearTimer) {
+        clearTimeout(clearTimer);
+        clearTimer = null;
+      }
+      elements.txt.style.opacity = '0';
+      elements.bg.style.opacity = '0';
+      elements.ltWrap.style.opacity = '0';
+      syncVideoState(elements.bgVideo, null, false, { loop: true, playbackRate: 1 });
+      syncVideoState(elements.ltVideo, null, false, { loop: true, playbackRate: 1 });
+      syncYoutubeState(elements.bgYoutube, elements.bgYoutubeFrame, null, false);
+      syncYoutubeState(elements.ltYoutube, elements.ltYoutubeFrame, null, false);
+      elements.customRefBox.style.display = 'none';
+      if (elements.customVersionBar) elements.customVersionBar.style.display = 'none';
+      elements.customMainBar.style.display = 'none';
+      elements.txt.innerHTML = '';
+      elements.txt.classList.remove('transition-anim', 'anim-fade', 'anim-zoom', 'anim-write', 'slide-up', 'scale-in');
+      elements.customMainBar.classList.remove('transition-anim', 'anim-fade', 'anim-zoom', 'anim-write');
+      elements.customRefBox.classList.remove('transition-anim', 'anim-fade', 'anim-zoom', 'anim-write');
+      if (elements.customVersionBar) {
+        elements.customVersionBar.classList.remove('transition-anim', 'anim-fade', 'anim-zoom', 'anim-write');
+      }
+      clearTypeTimers();
+      transitionState.textKey = null;
+      transitionState.type = null;
+      transitionState.startTime = 0;
+      transitionState.duration = 0;
+      
+      currentState = {
+        mode: 'full',
+        isBible: false,
+        text: '',
+        styleData: null,
+        isLive: false
+      };
+    }
+
+    function clearDisplay(opts = {}) {
+      const fade = opts.fade !== false;
+      const durationSec = clamp(Number(opts.duration ?? currentState.transitionDuration ?? 0.3), 0, 10);
+      cancelPendingClear();
+      const animTargets = [elements.txt, elements.customMainBar, elements.customRefBox, elements.customVersionBar];
+      animTargets.forEach((el) => {
+        if (!el) return;
+        el.classList.remove('transition-anim', 'anim-fade', 'anim-zoom', 'anim-write');
+        el.style.animation = 'none';
+        void el.offsetWidth; // ensure animation reset applies immediately
+        el.style.animation = '';
+      });
+      clearTypeTimers();
+      if (!fade || durationSec <= 0) {
+        finalizeClear();
+        return;
+      }
+      const token = clearToken;
+      elements.txt.style.opacity = '0';
+      elements.bg.style.opacity = '0';
+      elements.ltWrap.style.opacity = '0';
+      elements.customRefBox.style.opacity = '0';
+      elements.customMainBar.style.opacity = '0';
+      if (elements.customVersionBar) elements.customVersionBar.style.opacity = '0';
+      clearTimer = setTimeout(() => {
+        if (token !== clearToken) return;
+        finalizeClear();
+      }, Math.round(durationSec * 1000));
+    }
+    
+    // Calculate optimal font size for Bible LT mode
+    function calculateBibleFontSize(lineCount, baseSize) {
+      if (lineCount <= 2) return baseSize;
+      if (lineCount === 3) return Math.max(baseSize * 0.85, 24);
+      if (lineCount === 4) return Math.max(baseSize * 0.75, 20);
+      return Math.max(baseSize * 0.65, 18);
+    }
+    
+    // Handle window resize
+    function handleResize() {
+      resizeYoutubeFrames();
+      if (currentState.mode === 'lt' && currentState.isBible) {
+        // Recalculate positioning for Bible LT mode
+        const textX = Number(currentState.textX || 0);
+        const textY = Number(currentState.textY || 860);
+        const padLR = Math.max(0, Math.min(20, Number(currentState.padLR ?? 0)));
+        
+        elements.txt.style.left = (textX + (padLR * 0.01 * window.innerWidth / 100)) + 'px';
+        elements.txt.style.right = (padLR * 0.01 * window.innerWidth / 100) + 'px';
+      }
+    }
+    
+    // ===== INIT =====
+    function bindDisplayEventsOnce() {
+      if (window.__bspDisplayEventsBound) return;
+      window.__bspDisplayEventsBound = true;
+      window.addEventListener('resize', handleLtLayoutResize);
+      window.addEventListener('resize', handleResize);
+      window.addEventListener('beforeunload', () => {
+        if (rafId) cancelAnimationFrame(rafId);
+        if (helloTimer) {
+          clearInterval(helloTimer);
+          helloTimer = null;
+        }
+        channel.close();
+        disconnectRelay();
+      });
+      window.addEventListener('error', (ev) => {
+        const m = (ev && ev.message) ? ev.message : (ev && ev.error ? String(ev.error) : 'Unknown error');
+        debug('Window error: ' + m + ' at ' + (ev.filename || '') + ':' + (ev.lineno||'') + ':' + (ev.colno||''), true);
+      });
+      window.addEventListener('unhandledrejection', (ev) => {
+        debug('Unhandled rejection: ' + (ev && ev.reason && (ev.reason.message || String(ev.reason)) || String(ev.reason)), true);
+      });
+    }
+
+    function initDisplay() {
+      bindDisplayEventsOnce();
+      init();
+    }
+
+    window.addEventListener('load', initDisplay);
+    
+    // Export for debugging
+    window.displayDebug = {
+      currentState,
+      elements,
+      clearDisplay,
+      updateSettings: handleUpdate
+    };
+    
+    console.log('Bible Song Pro Display loaded successfully');
+
+  </script>
+</body>
+</html>
