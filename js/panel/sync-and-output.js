@@ -496,9 +496,11 @@
         'text-shadow:none;';
       const showVerseNos = ui.showVerseNos;
       let verseRaw = p.text;
+      // console.log('Original verse text:', verseRaw);
       if (!showVerseNos) {
         verseRaw = verseRaw.replace(/<span class="jo-verse-sup">.*?<\/span>\s*/g, '');
       }
+      // let verseHtml = convertHighlightsToHtml(verseRaw.toUpperCase()); // convert all output text to uppercase
       let verseHtml = convertHighlightsToHtml(verseRaw);
       
       let fontSizeAdjusted = fontSizeLT;
