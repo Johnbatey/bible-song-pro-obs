@@ -30,6 +30,8 @@ A modern church presentation system for OBS Studio that lets you display Bible v
 - Fully customizable display
 - Lightweight and fast
 - Works directly inside OBS Browser Source
+- Increased Lines tab
+- Text content auto-adjusts based screen view-width
 
 ---
 

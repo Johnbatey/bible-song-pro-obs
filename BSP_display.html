@@ -2245,6 +2245,7 @@
       if (stdFont.direction === 'rtl') elements.txt.style.unicodeBidi = 'plaintext';
       if (stdFont.textAlign) elements.txt.style.textAlign = stdFont.textAlign;
       elements.txt.style.fontSize = (mode === 'full' ? d.fontSizeFull : d.fontSizeLT) + 'pt';
+      elements.txt.style.fontSize = convertPtToVw(Number(elements.txt.style.fontSize.replace('pt', ''))) + 'vw';
       elements.txt.style.lineHeight = (mode === 'full' ? d.lineHeightFull : (d.lineHeightLT || 1.1));
       const effectiveTextTransform = (mode === 'full')
         ? (!isBible ? (d.fullTextTransform || 'none') : 'none')
@@ -2265,12 +2266,13 @@
         elements.txt.style.height = '100%';
         const fullPadLR = Math.max(0, Number(d.padLRFull ?? d.padLR ?? 5));
         elements.txt.style.padding = `0 ${fullPadLR}%`;
-        elements.txt.style.transform = 'none';
+        elements.txt.style.transform = 'none'; // here
         elements.txt.style.display = 'flex';
         elements.txt.style.alignItems = (hAlign === 'left') ? 'flex-start' : (hAlign === 'right') ? 'flex-end' : (hAlign === 'justify' ? 'stretch' : 'center');
         elements.txt.style.justifyContent = (vAlign === 'top') ? 'flex-start' : (vAlign === 'bottom' ? 'flex-end' : 'center');
         elements.txt.style.flexDirection = 'column';
         elements.txt.style.margin = '0 auto';
+        // elements.txt.style.fontSize = '5vw';
       } else {
         // Lower third mode
         const ltAnchorMode = getLtAnchorMode(d);
@@ -2314,6 +2316,25 @@
         }
       }
     }
+
+    /**
+   * Converts pt (points) to vw (viewport width)
+   * @param {number} pt - The value in points
+   * @returns {number} - The equivalent value in vw units
+   * Custom code by Phreaker
+   */
+  function convertPtToVw(pt) {
+    // 1pt = 1.3333... pixels (96 DPI / 72 pt per inch)
+    const px = pt * (96 / 72);
+
+    // Get current viewport width (1vw = 1% of this width)
+    const viewportWidth = window.innerWidth;
+
+    // Calculate vw: (px / viewportWidth) * 100
+    const vw = (px / viewportWidth) * 100;
+
+    return (vw + 2).toFixed(3); // Returns as a string with 3 decimal places
+  }
 
     function isGifSource(src) {
       if (!src) return false;
