@@ -159,12 +159,53 @@ than any new feature is worth, so these come before anything else.
    - *Where:* `js/panel/program-display-and-transform.js`,
      `js/panel/render-and-selection.js`, `js/panel/sync-and-output.js`.
 
+5. **Panel ↔ display heartbeat with visible health indicator**
+   - *Why:* If the Browser Source silently drops the `BroadcastChannel` link,
+     the operator keeps clicking "Go Live" and nothing reaches the stream.
+     Today there is no in-dock signal that the display is actually listening.
+   - *What:* A periodic heartbeat from `BSP_display.html` back to the panel,
+     plus a green/amber/red "Display" status pill in the dock header; on red,
+     auto-attempt resync and surface a "reload display" hint.
+   - *Where:* `js/panel/sync-and-output.js`, `BSP_display.html`,
+     `js/panel/sidebar-and-workspace.js`.
+
+6. **Confirm-before-close & "service in progress" guard**
+   - *Why:* A volunteer tabbing away, closing the dock, or refreshing OBS
+     mid-service will silently blank the stream. The app should know when a
+     service is live and resist accidental teardown.
+   - *What:* Mark a service "in progress" the moment the first item goes live;
+     intercept `beforeunload`, dock-close, and hotkey-reload with a confirm
+     dialog; expose a "End Service" button to clear the flag intentionally.
+   - *Where:* `js/panel/bootstrap-and-init.js`,
+     `js/panel/app-commands-and-shortcuts.js`,
+     `js/panel/state-and-storage.js`.
+
+7. **Safe-mode boot when persisted state is corrupt**
+   - *Why:* A malformed setlist or bad theme JSON in `localStorage` can take
+     the whole dock down on launch — the worst possible time, right before a
+     service. There must always be a way back into a working panel.
+   - *What:* Wrap state hydration in a try/catch; on parse failure, boot into
+     a "Safe Mode" with defaults, keep the broken state in a quarantined key
+     for recovery, and show a banner explaining what happened.
+   - *Where:* `js/panel/state-and-storage.js`,
+     `js/panel/bootstrap-and-init.js`.
+
+8. **Pre-service checklist / "Ready for service" diagnostic**
+   - *Why:* Most live-service failures are preventable: wrong Bible version
+     missing offline, display source not added, vMix not reachable, fonts not
+     loaded. A 10-second check before the doors open catches all of them.
+   - *What:* A "Run Pre-Service Check" button that verifies display link,
+     offline Bible availability, selected fonts, vMix/OBS bridge, and
+     storage headroom, then reports pass/warn/fail with one-click fixes.
+   - *Where:* New `js/panel/preflight.js`, wired into
+     `js/panel/sidebar-and-workspace.js` and `js/panel/sync-and-output.js`.
+
 ### P1 — Operator workflow & Sunday-morning speed
 
 Once the service is safe, the next win is making the operator faster under
 pressure.
 
-5. **Service plan import (Planning Center / Elvanto / CSV)**
+9. **Service plan import (Planning Center / Elvanto / CSV)**
    - *Why:* Most churches already plan songs + readings in Planning Center or
      similar. Re-typing them into the panel is duplicated work and a source of
      errors.
@@ -174,7 +215,7 @@ pressure.
    - *Where:* New `js/panel/service-plan-import.js`, wired into
      `js/panel/songs-and-bible.js` and setlist code.
 
-6. **CCLI reporting support**
+10. **CCLI reporting support**
    - *Why:* Licensed churches are required to report song usage to CCLI. If
      the plugin already tracks which song went live, it can export a compliant
      usage report and save the worship leader hours each month.
@@ -185,7 +226,7 @@ pressure.
      `js/panel/state-and-storage.js`, new export view in
      `js/panel/workspace-and-editor-tools.js`.
 
-7. **Bilingual / dual-language display (side-by-side, not just dual Bible)**
+11. **Bilingual / dual-language display (side-by-side, not just dual Bible)**
    - *Why:* Many churches run services in two languages (e.g. English +
      Spanish, English + Yoruba, English + Mandarin). Dual Bible versions exist,
      but song lyrics currently don't have a first-class bilingual layout.
@@ -195,7 +236,7 @@ pressure.
    - *Where:* `js/panel/vmix-and-translation.js`,
      `BSP_display.html`, `js/panel/program-display-and-transform.js`.
 
-8. **Scripture reference parser in the quick-search bar**
+12. **Scripture reference parser in the quick-search bar**
    - *Why:* Operators should type `john 3:16-18` or `ps 23` into one box and
      get the verse staged. Today's flow requires picking a book + chapter +
      verse explicitly.
@@ -206,7 +247,7 @@ pressure.
 
 ### P2 — Integration with the rest of the church stack
 
-9. **OBS WebSocket control (scenes + hotkeys from inside the dock)**
+13. **OBS WebSocket control (scenes + hotkeys from inside the dock)**
    - *Why:* The dock currently talks to the display but not to OBS itself.
      Letting it trigger OBS scene changes (e.g. switch to "Sermon" scene when
      a Bible reference goes live) removes a whole operator role.
@@ -215,7 +256,7 @@ pressure.
    - *Where:* New `js/panel/obs-websocket-bridge.js`; reuse
      `js/panel/sync-and-output.js`.
 
-10. **Stream Deck / MIDI / keyboard macro layer**
+14. **Stream Deck / MIDI / keyboard macro layer**
     - *Why:* Volunteers are more confident with physical buttons than mouse
       hunting. Stream Deck is near-universal in church AV.
     - *What:* Expose panel commands over a stable local WebSocket + a Stream
@@ -223,7 +264,7 @@ pressure.
     - *Where:* `js/panel/app-commands-and-shortcuts.js`, new
       `integrations/streamdeck/` plugin folder.
 
-11. **Remote operator mode (tablet on the platform, laptop in the booth)**
+15. **Remote operator mode (tablet on the platform, laptop in the booth)**
     - *Why:* The worship leader on stage often wants to advance lyrics
       themselves. Today that requires a second OBS instance.
     - *What:* A minimal web client that connects to the panel over LAN (same
@@ -231,7 +272,7 @@ pressure.
       interface suitable for a phone or tablet.
     - *Where:* `js/panel/remote-show-tools.js`, new `remote/` static app.
 
-12. **Accessibility & readability pass on `BSP_display.html`**
+16. **Accessibility & readability pass on `BSP_display.html`**
     - *Why:* Viewers on small phones, older displays, and those with low
       vision struggle with thin fonts, low contrast, and tiny lower-thirds.
     - *What:* WCAG-AA contrast presets, min-font-size guardrails, automatic
@@ -243,19 +284,19 @@ pressure.
 
 ### P3 — Growth features (after the above land)
 
-13. **Sermon notes / outline projection** — separate content type alongside
+17. **Sermon notes / outline projection** — separate content type alongside
     Songs and Bible, so pastors can publish an outline slide track (likely a
     new tab and new storage namespace in `state-and-storage.js`).
-14. **Multi-campus sync** — one "host" panel broadcasts Program state to
+18. **Multi-campus sync** — one "host" panel broadcasts Program state to
     "follower" panels at other campuses via the existing Worker relay; reuse
     `feedback-worker/` infrastructure with a new `bsp-sync` Worker.
-15. **Recording a "service highlight reel"** — tag moments while live, then
+19. **Recording a "service highlight reel"** — tag moments while live, then
     export a chapter list for the stream VOD
     (`recording-and-livestream-tools.js`).
-16. **Song library sharing between churches** — signed JSON bundles of song
+20. **Song library sharing between churches** — signed JSON bundles of song
     packs (lyrics + arrangement + CCLI number) that can be imported without
     re-typing, gated on CCLI compliance.
-17. **Translator console** — a dedicated view for a live translator that sees
+21. **Translator console** — a dedicated view for a live translator that sees
     upcoming verses + song lines a few seconds early and can push an override
     translation to the bilingual layout (#7).
 
@@ -277,7 +318,7 @@ pressure.
 
 | Priority | Theme | Items |
 |---|---|---|
-| **P0** | Don't break the live service | Autosave/restore, panic buttons, offline cache, Preview/Program |
+| **P0** | Don't break the live service | Autosave/restore, panic buttons, offline cache, Preview/Program, display heartbeat, close guard, safe-mode boot, pre-service checklist |
 | **P1** | Make Sunday morning faster | Service-plan import, CCLI reports, bilingual display, reference parser |
 | **P2** | Fit the church AV stack | OBS WebSocket, Stream Deck/MIDI, remote operator, accessibility pass |
 | **P3** | Grow the product | Sermon notes, multi-campus sync, highlight reel, song sharing, translator console |
