@@ -614,6 +614,31 @@
       backface-visibility: hidden;
       perspective: 1000px;
     }
+
+    #bsp-panic-overlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    #bsp-panic-overlay.hidden { display: none; }
+    #bsp-panic-overlay .bsp-panic-logo {
+      max-width: 40vw;
+      max-height: 40vh;
+      opacity: 0.9;
+    }
+    #bsp-panic-overlay .bsp-panic-fallback {
+      color: #fff;
+      font-family: sans-serif;
+      font-size: 6vmin;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      opacity: 0.9;
+    }
   </style>
 </head>
 <body>
@@ -644,6 +669,8 @@
     <div id="debug-status" style="font-weight:bold;margin-bottom:6px">DEBUG: initializing...</div>
     <div id="debug-logs"></div>
   </div>
+
+  <div id="bsp-panic-overlay" class="hidden"></div>
 
   <script>
     'use strict';
@@ -999,6 +1026,15 @@
       };
     }
 
+    function hideBspPanicOverlay() {
+      const __panicOverlay = document.getElementById('bsp-panic-overlay');
+      if (__panicOverlay && !__panicOverlay.classList.contains('hidden')) {
+        __panicOverlay.classList.add('hidden');
+        __panicOverlay.removeAttribute('data-panic-mode');
+        __panicOverlay.innerHTML = '';
+      }
+    }
+
     function handleInboundMessage(d, source) {
       debug(`MSG(${source}): ` + (d.type || 'unknown') + (d.text ? ' — ' + (String(d.text).slice(0,80)) : ''));
       try {
@@ -1010,10 +1046,12 @@
             break;
           }
           case 'CLEAR':
+            hideBspPanicOverlay();
             hasSynced = true;
             if (acceptSeq(d.seq)) clearDisplay({ fade: d.fade !== false, duration: d.transitionDuration });
             break;
           case 'UPDATE':
+            hideBspPanicOverlay();
             hasSynced = true;
             if (!acceptSeq(d.seq)) return;
             applyUpdateWithThrottle(d);
@@ -1028,6 +1066,25 @@
               clearDisplay();
             } else if (state.kind === 'update' && payload) {
               applyUpdateWithThrottle(payload);
+            }
+            break;
+          }
+          case 'PANIC': {
+            const overlay = document.getElementById('bsp-panic-overlay');
+            if (!overlay) break;
+            const mode = d && d.mode ? String(d.mode) : 'clear';
+            if (mode === 'clear') {
+              overlay.classList.add('hidden');
+              overlay.removeAttribute('data-panic-mode');
+              overlay.innerHTML = '';
+            } else {
+              overlay.setAttribute('data-panic-mode', mode);
+              overlay.classList.remove('hidden');
+              if (mode === 'logo') {
+                overlay.innerHTML = '<img class="bsp-panic-logo" src="assets/bible-song-pro-icon.png" alt="" onerror="this.remove();var s=document.createElement(\'div\');s.className=\'bsp-panic-fallback\';s.textContent=\'BIBLE SONG PRO\';document.getElementById(\'bsp-panic-overlay\').appendChild(s);">';
+              } else {
+                overlay.innerHTML = '';
+              }
             }
             break;
           }
