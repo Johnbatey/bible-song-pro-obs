@@ -298,7 +298,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Bible Song Pro - ${opts.preview ? 'Program Preview' : 'Standalone Output'}</title>
+  <title>BibleRhythm AGL - ${opts.preview ? 'Program Preview' : 'Standalone Output'}</title>
   <style>
     :root { color-scheme: dark; }
     * { box-sizing: border-box; }

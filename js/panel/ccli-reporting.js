@@ -1,5 +1,5 @@
     // =============================================================
-    // Bible Song Pro — CCLI Reporting (P1 #10)
+    // BibleRhythm AGL — CCLI Reporting (P1 #10)
     // =============================================================
     //
     // Licensed churches are required to report song usage to CCLI.  This
@@ -723,5 +723,5 @@
     });
 
     // =============================================================
-    // END OF FILE — Bible Song Pro CCLI Reporting
+    // END OF FILE — BibleRhythm AGL CCLI Reporting
     // =============================================================

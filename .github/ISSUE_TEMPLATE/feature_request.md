@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an improvement or new feature for Bible Song Pro
+about: Suggest an improvement or new feature for BibleRhythm AGL
 title: "[Feature] "
 labels: enhancement
 assignees: ""

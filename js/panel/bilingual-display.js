@@ -1,5 +1,5 @@
     // =============================================================
-    // Bible Song Pro — Bilingual Display (P1 #11)
+    // BibleRhythm AGL — Bilingual Display (P1 #11)
     // =============================================================
     //
     // A "Bilingual" display template that renders primary + secondary
@@ -414,5 +414,5 @@
     });
 
     // =============================================================
-    // END OF FILE — Bible Song Pro Bilingual Display
+    // END OF FILE — BibleRhythm AGL Bilingual Display
     // =============================================================

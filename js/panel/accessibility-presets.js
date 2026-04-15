@@ -1,5 +1,5 @@
     // =============================================================
-    // Bible Song Pro — Accessibility & Readability Pass (P2 #16)
+    // BibleRhythm AGL — Accessibility & Readability Pass (P2 #16)
     // =============================================================
     //
     // WCAG-AA contrast presets, minimum-font-size guardrails,
@@ -531,5 +531,5 @@
     });
 
     // =============================================================
-    // END OF FILE — Bible Song Pro Accessibility Presets
+    // END OF FILE — BibleRhythm AGL Accessibility Presets
     // =============================================================

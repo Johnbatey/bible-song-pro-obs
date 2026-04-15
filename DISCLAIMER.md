@@ -1,6 +1,6 @@
 # Disclaimer
 
-`Bible Song Pro` is provided as-is, without any guarantee of uninterrupted operation, compatibility with every OBS version, or suitability for every workflow.
+`BibleRhythm AGL` is provided as-is, without any guarantee of uninterrupted operation, compatibility with every OBS version, or suitability for every workflow.
 
 ## Use At Your Own Risk
 

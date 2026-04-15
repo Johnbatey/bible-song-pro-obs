@@ -1,5 +1,5 @@
     // =============================================================
-    // Bible Song Pro — Service Highlight Reel (P3 #19)
+    // BibleRhythm AGL — Service Highlight Reel (P3 #19)
     // =============================================================
     //
     // Operators tag moments while a service is running ("Mark").  The
@@ -548,5 +548,5 @@
     });
 
     // =============================================================
-    // END OF FILE — Bible Song Pro Highlight Reel
+    // END OF FILE — BibleRhythm AGL Highlight Reel
     // =============================================================

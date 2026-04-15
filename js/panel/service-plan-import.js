@@ -1,5 +1,5 @@
     // =============================================================
-    // Bible Song Pro — Service Plan Import (P1 #9)
+    // BibleRhythm AGL — Service Plan Import (P1 #9)
     // =============================================================
     //
     // Accepts a CSV (either a generic "type,title,reference" sheet, a
@@ -785,5 +785,5 @@
     });
 
     // =============================================================
-    // END OF FILE — Bible Song Pro Service Plan Import
+    // END OF FILE — BibleRhythm AGL Service Plan Import
     // =============================================================

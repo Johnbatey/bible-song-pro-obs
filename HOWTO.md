@@ -1,4 +1,4 @@
-# How To Use Bible Song Pro
+# How To Use BibleRhythm AGL
 
 Current release: `Version 1.0`
 
@@ -7,7 +7,7 @@ Current release: `Version 1.0`
 1. Extract the plugin files to a permanent folder.
 2. Open OBS.
 3. Go to `Docks > Custom Browser Docks`.
-4. Create a dock named `Bible Song Pro`.
+4. Create a dock named `BibleRhythm AGL`.
 5. Point it to `Bible Song Pro panel.html`.
 
 ## 2. Open The Display Page

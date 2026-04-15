@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a bug in Bible Song Pro
+about: Report a bug in BibleRhythm AGL
 title: "[Bug] "
 labels: bug
 assignees: ""

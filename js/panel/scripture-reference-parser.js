@@ -1,5 +1,5 @@
     // =============================================================
-    // Bible Song Pro — Scripture Reference Parser (P1 #12)
+    // BibleRhythm AGL — Scripture Reference Parser (P1 #12)
     // =============================================================
     //
     // Extends the existing parseBibleReferenceQuery / findBibleReferenceMatches
@@ -304,5 +304,5 @@
     };
 
     // =============================================================
-    // END OF FILE — Bible Song Pro Scripture Reference Parser
+    // END OF FILE — BibleRhythm AGL Scripture Reference Parser
     // =============================================================

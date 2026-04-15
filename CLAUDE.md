@@ -1,4 +1,4 @@
-# Bible Song Pro — OBS Plugin
+# BibleRhythm AGL — OBS Plugin
 
 This document describes **what the plugin does**, **how it is structured**, and a
 **prioritized list of planned improvements** to deliver more value for church use.
@@ -9,7 +9,7 @@ working in this repository.
 
 ## 1. What This Plugin Does
 
-Bible Song Pro is a church presentation tool that lives **inside OBS Studio** as a
+BibleRhythm AGL is a church presentation tool that lives **inside OBS Studio** as a
 Custom Browser Dock + Browser Source pair. It lets worship teams project
 **Bible verses** and **song lyrics** live on stream, without needing separate
 presentation software like ProPresenter or EasyWorship.

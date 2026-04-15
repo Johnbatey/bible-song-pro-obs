@@ -1,5 +1,5 @@
     // =============================================================
-    // Bible Song Pro — OBS WebSocket v5 Bridge (P2 #13)
+    // BibleRhythm AGL — OBS WebSocket v5 Bridge (P2 #13)
     // =============================================================
     //
     // Minimal obs-websocket v5 client so the panel can trigger OBS
@@ -677,5 +677,5 @@
     });
 
     // =============================================================
-    // END OF FILE — Bible Song Pro OBS WebSocket Bridge
+    // END OF FILE — BibleRhythm AGL OBS WebSocket Bridge
     // =============================================================

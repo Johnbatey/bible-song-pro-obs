@@ -112,7 +112,7 @@ function createMainWindow() {
     minWidth: 560,
     minHeight: 760,
     backgroundColor: '#101318',
-    title: 'Bible Song Pro',
+    title: 'BibleRhythm AGL',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,

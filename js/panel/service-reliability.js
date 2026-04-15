@@ -1,5 +1,5 @@
     // =============================================================
-    // Bible Song Pro — Service-Day Reliability (P0)
+    // BibleRhythm AGL — Service-Day Reliability (P0)
     // =============================================================
     //
     // Implements the 8 P0 items from CLAUDE.md in a single self-contained
@@ -1179,7 +1179,7 @@
     });
 
     // =============================================================
-    // END OF FILE — Bible Song Pro Service Reliability
+    // END OF FILE — BibleRhythm AGL Service Reliability
     // =============================================================
 
 

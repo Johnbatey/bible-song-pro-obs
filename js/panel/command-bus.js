@@ -1,5 +1,5 @@
     // =============================================================
-    // Bible Song Pro — Command Bus + MIDI Learn (P2 #14)
+    // BibleRhythm AGL — Command Bus + MIDI Learn (P2 #14)
     // =============================================================
     //
     // A unified command surface so external controllers (Stream Deck,
@@ -568,9 +568,9 @@
 
     function bspCmdStreamDeckManifest() {
       return {
-        name: 'Bible Song Pro',
+        name: 'BibleRhythm AGL',
         version: BSP_CMD_VERSION,
-        description: 'Stream Deck command surface for Bible Song Pro panel',
+        description: 'Stream Deck command surface for BibleRhythm AGL panel',
         transport: 'broadcastchannel',
         channelName: (typeof CHANNEL_NAME !== 'undefined') ? CHANNEL_NAME : 'bible_song_pro_v1',
         actions: bspCmdList()
@@ -650,5 +650,5 @@
     });
 
     // =============================================================
-    // END OF FILE — Bible Song Pro Command Bus + MIDI Learn
+    // END OF FILE — BibleRhythm AGL Command Bus + MIDI Learn
     // =============================================================

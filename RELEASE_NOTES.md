@@ -1,10 +1,10 @@
-# Bible Song Pro - Version 2.0.0
+# BibleRhythm AGL - Version 2.0.0
 
 ## Release Summary
 
-Bible Song Pro `Version 2.0.0` is the first major packaged release of the project.
+BibleRhythm AGL `Version 2.0.0` is the first major packaged release of the project.
 
-Built on top of the original OBS custom dock workflow, this update expands Bible Song Pro into a broader release with desktop packaging, vMix support, translation tools, feedback reporting, and stronger sync reliability for live presentation use.
+Built on top of the original OBS custom dock workflow, this update expands BibleRhythm AGL into a broader release with desktop packaging, vMix support, translation tools, feedback reporting, and stronger sync reliability for live presentation use.
 
 ## Highlights
 
