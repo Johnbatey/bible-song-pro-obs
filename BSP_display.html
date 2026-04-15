@@ -294,7 +294,29 @@
       opacity: 0.9;
       font-size: 0.95em;
     }
-    
+
+    /* P1 #11: bilingual (side-by-side / stacked) display overlay.
+       Activated by adding .bsp-bilingual-active to #text-container
+       whenever an UPDATE payload carries bilingualEnabled + secondaryText. */
+    #text-container.bsp-bilingual-active {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+    }
+    #text-container.bsp-bilingual-active .bsp-bilingual-primary {
+      flex: 0 0 auto;
+    }
+    #text-container.bsp-bilingual-active .bsp-bilingual-secondary {
+      margin-top: 0.5em;
+      opacity: 0.82;
+      font-size: 0.68em;
+      line-height: 1.2;
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+      padding-top: 0.4em;
+      word-break: break-word;
+    }
+
     .jo-highlight {
       display: block;
       margin: 0 0 0.35em;
@@ -1765,6 +1787,10 @@
         elements.txt.classList.toggle('dual-mode', isDualMode);
         elements.cont.classList.toggle('dual-mode', isDualMode);
         elements.txt.style.display = 'flex';
+        // P1 #11: bilingual overlay — augments the primary text with a
+        // stacked secondary-language block whenever the incoming UPDATE
+        // carries `bilingualEnabled` + `secondaryText`.  No-op otherwise.
+        applyBilingualOverlay(d);
       }
       elements.txt.style.color = d.textColor || '#ffffff';
       elements.txt.style.fontWeight = d.fontWeight || '700';
@@ -1797,7 +1823,67 @@
         console.error('Font diagnostic logging failed', e);
       }
     }
-    
+
+    // P1 #11: bilingual (stacked side-by-side) overlay.
+    //
+    // When `d.bilingualEnabled` is true and `d.secondaryText` is a
+    // non-empty string, wrap the current text-container content in a
+    // .bsp-bilingual-primary div and append a .bsp-bilingual-secondary
+    // block with the secondary-language text underneath.  When the
+    // flag is off (or secondaryText is empty), strip the class and any
+    // leftover secondary element so the display reverts cleanly.
+    //
+    // This runs AFTER the normal text rendering so it doesn't interfere
+    // with dual-version Bible mode, custom styles, or the existing
+    // panel-side `song-bilingual-stack` pre-stacking — it's purely
+    // additive for the global bilingual-display toggle.
+    function applyBilingualOverlay(d) {
+      const container = elements.txt;
+      if (!container) return;
+      const wantActive = !!(d && d.bilingualEnabled && typeof d.secondaryText === 'string' && d.secondaryText.trim());
+      if (!wantActive) {
+        if (container.classList.contains('bsp-bilingual-active')) {
+          container.classList.remove('bsp-bilingual-active');
+          const stale = container.querySelector(':scope > .bsp-bilingual-secondary');
+          if (stale && stale.parentNode) stale.parentNode.removeChild(stale);
+          // Unwrap any primary wrapper we previously added.
+          const primary = container.querySelector(':scope > .bsp-bilingual-primary');
+          if (primary && primary.parentNode) {
+            while (primary.firstChild) primary.parentNode.insertBefore(primary.firstChild, primary);
+            primary.parentNode.removeChild(primary);
+          }
+        }
+        return;
+      }
+      // Wrap the existing inner content (currently a single
+      // .text-anim-content child) in a .bsp-bilingual-primary div and
+      // append the secondary block after it.
+      container.classList.add('bsp-bilingual-active');
+      // Remove any previous secondary block so we re-render fresh.
+      const prevSecondary = container.querySelector(':scope > .bsp-bilingual-secondary');
+      if (prevSecondary && prevSecondary.parentNode) prevSecondary.parentNode.removeChild(prevSecondary);
+      // Ensure a .bsp-bilingual-primary wrapper exists exactly once
+      // around the current children.
+      let primary = container.querySelector(':scope > .bsp-bilingual-primary');
+      if (!primary) {
+        primary = document.createElement('div');
+        primary.className = 'bsp-bilingual-primary';
+        const children = Array.from(container.childNodes);
+        children.forEach((node) => primary.appendChild(node));
+        container.appendChild(primary);
+      }
+      const secondary = document.createElement('div');
+      secondary.className = 'bsp-bilingual-secondary';
+      if (d.secondaryLanguage) secondary.setAttribute('data-lang', String(d.secondaryLanguage));
+      if (d.primaryLanguage) secondary.setAttribute('data-primary-lang', String(d.primaryLanguage));
+      // secondaryText arrives as HTML (the panel's secondary pipeline
+      // emits HTML via buildStackedSongBilingualHtml / convertHighlightsToHtml,
+      // and the bilingual-display.js fallback escapes plain text and
+      // inserts <br>), so innerHTML is the right assignment here.
+      secondary.innerHTML = d.secondaryText;
+      container.appendChild(secondary);
+    }
+
     // Handle custom mode (professional styles)
     function handleCustomMode(d, isBible) {
       const styleData = d.styleData || {};
