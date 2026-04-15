@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Bible Song Pro - Display</title>
+  <title>BibleRhythm AGL - Display</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Noto fonts: improve Arabic and CJK coverage -->
@@ -294,7 +294,29 @@
       opacity: 0.9;
       font-size: 0.95em;
     }
-    
+
+    /* P1 #11: bilingual (side-by-side / stacked) display overlay.
+       Activated by adding .bsp-bilingual-active to #text-container
+       whenever an UPDATE payload carries bilingualEnabled + secondaryText. */
+    #text-container.bsp-bilingual-active {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+    }
+    #text-container.bsp-bilingual-active .bsp-bilingual-primary {
+      flex: 0 0 auto;
+    }
+    #text-container.bsp-bilingual-active .bsp-bilingual-secondary {
+      margin-top: 0.5em;
+      opacity: 0.82;
+      font-size: 0.68em;
+      line-height: 1.2;
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+      padding-top: 0.4em;
+      word-break: break-word;
+    }
+
     .jo-highlight {
       display: block;
       margin: 0 0 0.35em;
@@ -614,6 +636,66 @@
       backface-visibility: hidden;
       perspective: 1000px;
     }
+
+    #bsp-panic-overlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    #bsp-panic-overlay.hidden { display: none; }
+    #bsp-panic-overlay .bsp-panic-logo {
+      max-width: 40vw;
+      max-height: 40vh;
+      opacity: 0.9;
+    }
+    #bsp-panic-overlay .bsp-panic-fallback {
+      color: #fff;
+      font-family: sans-serif;
+      font-size: 6vmin;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      opacity: 0.9;
+    }
+
+    /* P2 #16: accessibility & readability pass */
+    #bsp-a11y-safe-area {
+      position: fixed;
+      top: 5%;
+      left: 5%;
+      right: 5%;
+      bottom: 5%;
+      border: 2px dashed rgba(255, 255, 0, 0.6);
+      pointer-events: none;
+      z-index: 9998;
+    }
+    #bsp-a11y-safe-area.hidden { display: none; }
+    #bsp-a11y-safe-area::after {
+      content: "SAFE AREA 90%";
+      position: absolute;
+      top: -22px;
+      left: 0;
+      color: rgba(255, 255, 0, 0.85);
+      font: 700 11px sans-serif;
+      letter-spacing: 0.1em;
+    }
+    #text-container.bsp-a11y-auto-shadow .rendered-line,
+    #text-container.bsp-a11y-auto-shadow,
+    #text-container.bsp-a11y-auto-shadow * {
+      text-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.92),
+        0 0 3px rgba(0, 0, 0, 0.85),
+        0 0 1px rgba(0, 0, 0, 0.8) !important;
+    }
+    body.bsp-a11y-preset-high-contrast-dark #text-container { color: #ffffff !important; }
+    body.bsp-a11y-preset-high-contrast-light #text-container { color: #000000 !important; }
+    body.bsp-a11y-preset-warm-amber #text-container { color: #ffd580 !important; }
+    body.bsp-a11y-preset-soft-cyan #text-container { color: #b3e5fc !important; }
+    body.bsp-a11y-preset-low-vision-yellow #text-container { color: #ffff00 !important; }
   </style>
 </head>
 <body>
@@ -644,6 +726,9 @@
     <div id="debug-status" style="font-weight:bold;margin-bottom:6px">DEBUG: initializing...</div>
     <div id="debug-logs"></div>
   </div>
+
+  <div id="bsp-panic-overlay" class="hidden"></div>
+  <div id="bsp-a11y-safe-area" class="hidden"></div>
 
   <script>
     'use strict';
@@ -913,7 +998,7 @@
         }, 1200);
       }
 
-      console.log('Bible Song Pro Display initialized');
+      console.log('BibleRhythm AGL Display initialized');
     }
     
     // Handle incoming messages
@@ -999,6 +1084,15 @@
       };
     }
 
+    function hideBspPanicOverlay() {
+      const __panicOverlay = document.getElementById('bsp-panic-overlay');
+      if (__panicOverlay && !__panicOverlay.classList.contains('hidden')) {
+        __panicOverlay.classList.add('hidden');
+        __panicOverlay.removeAttribute('data-panic-mode');
+        __panicOverlay.innerHTML = '';
+      }
+    }
+
     function handleInboundMessage(d, source) {
       debug(`MSG(${source}): ` + (d.type || 'unknown') + (d.text ? ' — ' + (String(d.text).slice(0,80)) : ''));
       try {
@@ -1010,10 +1104,12 @@
             break;
           }
           case 'CLEAR':
+            hideBspPanicOverlay();
             hasSynced = true;
             if (acceptSeq(d.seq)) clearDisplay({ fade: d.fade !== false, duration: d.transitionDuration });
             break;
           case 'UPDATE':
+            hideBspPanicOverlay();
             hasSynced = true;
             if (!acceptSeq(d.seq)) return;
             applyUpdateWithThrottle(d);
@@ -1028,6 +1124,25 @@
               clearDisplay();
             } else if (state.kind === 'update' && payload) {
               applyUpdateWithThrottle(payload);
+            }
+            break;
+          }
+          case 'PANIC': {
+            const overlay = document.getElementById('bsp-panic-overlay');
+            if (!overlay) break;
+            const mode = d && d.mode ? String(d.mode) : 'clear';
+            if (mode === 'clear') {
+              overlay.classList.add('hidden');
+              overlay.removeAttribute('data-panic-mode');
+              overlay.innerHTML = '';
+            } else {
+              overlay.setAttribute('data-panic-mode', mode);
+              overlay.classList.remove('hidden');
+              if (mode === 'logo') {
+                overlay.innerHTML = '<img class="bsp-panic-logo" src="assets/bible-song-pro-icon.png" alt="" onerror="this.remove();var s=document.createElement(\'div\');s.className=\'bsp-panic-fallback\';s.textContent=\'BIBLERHYTHM AGL\';document.getElementById(\'bsp-panic-overlay\').appendChild(s);">';
+              } else {
+                overlay.innerHTML = '';
+              }
             }
             break;
           }
@@ -1708,6 +1823,13 @@
         elements.txt.classList.toggle('dual-mode', isDualMode);
         elements.cont.classList.toggle('dual-mode', isDualMode);
         elements.txt.style.display = 'flex';
+        // P1 #11: bilingual overlay — augments the primary text with a
+        // stacked secondary-language block whenever the incoming UPDATE
+        // carries `bilingualEnabled` + `secondaryText`.  No-op otherwise.
+        applyBilingualOverlay(d);
+        // P2 #16: accessibility hints — contrast preset, auto-shadow,
+        // safe-area overlay. No-op unless a flag is active.
+        applyAccessibilityHints(d);
       }
       elements.txt.style.color = d.textColor || '#ffffff';
       elements.txt.style.fontWeight = d.fontWeight || '700';
@@ -1740,7 +1862,107 @@
         console.error('Font diagnostic logging failed', e);
       }
     }
-    
+
+    // P1 #11: bilingual (stacked side-by-side) overlay.
+    //
+    // When `d.bilingualEnabled` is true and `d.secondaryText` is a
+    // non-empty string, wrap the current text-container content in a
+    // .bsp-bilingual-primary div and append a .bsp-bilingual-secondary
+    // block with the secondary-language text underneath.  When the
+    // flag is off (or secondaryText is empty), strip the class and any
+    // leftover secondary element so the display reverts cleanly.
+    //
+    // This runs AFTER the normal text rendering so it doesn't interfere
+    // with dual-version Bible mode, custom styles, or the existing
+    // panel-side `song-bilingual-stack` pre-stacking — it's purely
+    // additive for the global bilingual-display toggle.
+    function applyBilingualOverlay(d) {
+      const container = elements.txt;
+      if (!container) return;
+      const wantActive = !!(d && d.bilingualEnabled && typeof d.secondaryText === 'string' && d.secondaryText.trim());
+      if (!wantActive) {
+        if (container.classList.contains('bsp-bilingual-active')) {
+          container.classList.remove('bsp-bilingual-active');
+          const stale = container.querySelector(':scope > .bsp-bilingual-secondary');
+          if (stale && stale.parentNode) stale.parentNode.removeChild(stale);
+          // Unwrap any primary wrapper we previously added.
+          const primary = container.querySelector(':scope > .bsp-bilingual-primary');
+          if (primary && primary.parentNode) {
+            while (primary.firstChild) primary.parentNode.insertBefore(primary.firstChild, primary);
+            primary.parentNode.removeChild(primary);
+          }
+        }
+        return;
+      }
+      // Wrap the existing inner content (currently a single
+      // .text-anim-content child) in a .bsp-bilingual-primary div and
+      // append the secondary block after it.
+      container.classList.add('bsp-bilingual-active');
+      // Remove any previous secondary block so we re-render fresh.
+      const prevSecondary = container.querySelector(':scope > .bsp-bilingual-secondary');
+      if (prevSecondary && prevSecondary.parentNode) prevSecondary.parentNode.removeChild(prevSecondary);
+      // Ensure a .bsp-bilingual-primary wrapper exists exactly once
+      // around the current children.
+      let primary = container.querySelector(':scope > .bsp-bilingual-primary');
+      if (!primary) {
+        primary = document.createElement('div');
+        primary.className = 'bsp-bilingual-primary';
+        const children = Array.from(container.childNodes);
+        children.forEach((node) => primary.appendChild(node));
+        container.appendChild(primary);
+      }
+      const secondary = document.createElement('div');
+      secondary.className = 'bsp-bilingual-secondary';
+      if (d.secondaryLanguage) secondary.setAttribute('data-lang', String(d.secondaryLanguage));
+      if (d.primaryLanguage) secondary.setAttribute('data-primary-lang', String(d.primaryLanguage));
+      // secondaryText arrives as HTML (the panel's secondary pipeline
+      // emits HTML via buildStackedSongBilingualHtml / convertHighlightsToHtml,
+      // and the bilingual-display.js fallback escapes plain text and
+      // inserts <br>), so innerHTML is the right assignment here.
+      secondary.innerHTML = d.secondaryText;
+      container.appendChild(secondary);
+    }
+
+    // P2 #16: accessibility hints — contrast preset classes on <body>,
+    // auto-shadow class on #text-container, safe-area overlay toggle.
+    // Reads flags set by js/panel/accessibility-presets.js on the
+    // outgoing UPDATE payload. No-op when all flags are absent.
+    function applyAccessibilityHints(d) {
+      const data = d || {};
+
+      // Preset → body class toggle. Clear any previous preset first so
+      // switching between presets never leaves a stale override.
+      const body = document.body;
+      if (body && body.classList) {
+        const stale = [];
+        body.classList.forEach(function (cls) {
+          if (cls && cls.indexOf('bsp-a11y-preset-') === 0) stale.push(cls);
+        });
+        stale.forEach(function (cls) { body.classList.remove(cls); });
+        if (data.accessibilityPresetId && data.accessibilityPresetId !== 'none') {
+          body.classList.add('bsp-a11y-preset-' + String(data.accessibilityPresetId));
+        }
+      }
+
+      // Auto-shadow toggle on #text-container. The class layers a strong
+      // text-shadow !important so it wins against any inline color.
+      const container = elements && elements.txt;
+      if (container && container.classList) {
+        container.classList.toggle('bsp-a11y-auto-shadow', !!data.accessibilityAutoShadow);
+      }
+
+      // Safe-area overlay div — always present in the DOM, only visible
+      // when the flag is set.
+      const safe = document.getElementById('bsp-a11y-safe-area');
+      if (safe) {
+        if (data.accessibilitySafeAreaOverlay) {
+          safe.classList.remove('hidden');
+        } else {
+          safe.classList.add('hidden');
+        }
+      }
+    }
+
     // Handle custom mode (professional styles)
     function handleCustomMode(d, isBible) {
       const styleData = d.styleData || {};
@@ -3223,7 +3445,7 @@
       updateSettings: handleUpdate
     };
     
-    console.log('Bible Song Pro Display loaded successfully');
+    console.log('BibleRhythm AGL Display loaded successfully');
 
   </script>
 </body>

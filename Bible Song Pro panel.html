@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bible Song Pro - Control Panel</title>
+  <title>BibleRhythm AGL - Control Panel</title>
   <style>
     :root {
       /* ══ Apple Design System — Dark Mode ══ */
@@ -16275,7 +16275,7 @@
           <div id="vmix-status-body" style="display:flex;gap:12px;align-items:flex-start;margin-top:10px;flex-wrap:wrap;min-width:0">
             <div style="display:flex;flex-direction:column;gap:2px;min-width:220px;flex:0 1 320px">
               <strong id="vmix-connection-label" style="font-size:12px">vMix disconnected</strong>
-              <span id="vmix-output-label" style="font-size:11px;color:var(--text-secondary)">Output: Bible Song Pro Output</span>
+              <span id="vmix-output-label" style="font-size:11px;color:var(--text-secondary)">Output: BibleRhythm AGL Output</span>
               <span id="vmix-mode-label" style="font-size:11px;color:var(--text-secondary)">Basic routing</span>
             </div>
             <div style="display:flex;gap:8px;align-items:center;flex:1 1 420px;min-width:260px">
@@ -17808,7 +17808,7 @@
               </div>
               <div class="settings-field" style="margin-bottom:0">
                 <label class="settings-label">Output Input Name</label>
-                <input type="text" id="vmix-output-input-name" class="settings-input" placeholder="Bible Song Pro Output">
+                <input type="text" id="vmix-output-input-name" class="settings-input" placeholder="BibleRhythm AGL Output">
               </div>
               <div class="settings-row" style="margin-bottom:0">
                 <div class="settings-field" style="margin-bottom:0">
@@ -19079,6 +19079,7 @@
   <input type="file" id="import-file" hidden multiple onchange="handleImport(this)">
   <input type="file" id="import-style-file" hidden accept=".fstemplate,.json,application/json" onchange="handleStyleImport(this)">
   <script src="js/panel/state-and-storage.js"></script>
+  <script src="js/panel/scripture-reference-parser.js"></script>
   <script src="js/panel/panel-app-core.js"></script>
   <script src="js/panel/reference-localization-theme.js"></script>
   <script src="js/panel/vmix-and-translation.js"></script>
@@ -19098,6 +19099,14 @@
   <script src="js/panel/sidebar-and-workspace.js"></script>
   <script src="js/panel/sync-and-output.js"></script>
   <script src="js/panel/bootstrap-and-init.js"></script>
+  <script src="js/panel/service-reliability.js"></script>
+  <script src="js/panel/ccli-reporting.js"></script>
+  <script src="js/panel/bilingual-display.js"></script>
+  <script src="js/panel/service-plan-import.js"></script>
+  <script src="js/panel/command-bus.js"></script>
+  <script src="js/panel/obs-websocket-bridge.js"></script>
+  <script src="js/panel/accessibility-presets.js"></script>
+  <script src="js/panel/highlight-reel.js"></script>
   <style id="obs-isolated-mode-style">
     body.vmix-mode #program-width-handle,
     body.vmix-mode #program-display-panel,

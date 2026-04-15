@@ -1228,7 +1228,7 @@
         if (bgUploadDataUrl != null) settings.bgUploadDataUrl = bgUploadDataUrl;
         if (bgVideoUploadDataUrl != null) settings.bgVideoUploadDataUrl = bgVideoUploadDataUrl;
         const backup = {
-          app: 'Bible Song Pro',
+          app: 'BibleRhythm AGL',
           backupVersion: 1,
           exportedAt: new Date().toISOString(),
           data: {
@@ -1340,7 +1340,7 @@
       try {
         const text = await file.text();
         const parsed = JSON.parse(text);
-        if (!parsed || parsed.app !== 'Bible Song Pro') {
+        if (!parsed || parsed.app !== 'BibleRhythm AGL') {
           showToast(t('backup_invalid_file'));
           return;
         }

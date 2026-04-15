@@ -1,4 +1,4 @@
-# Bible Song Pro Feedback Worker
+# BibleRhythm AGL Feedback Worker
 
 Cloudflare Worker for receiving in-app feedback and creating GitHub issues.
 

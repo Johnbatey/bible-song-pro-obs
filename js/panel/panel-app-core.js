@@ -159,7 +159,7 @@
       port: '8088',
       password: '',
       displayHost: '',
-      outputInputName: 'Bible Song Pro Output',
+      outputInputName: 'BibleRhythm AGL Output',
       outputInputKey: '',
       outputMode: VMIX_OUTPUT_MODE_DEDICATED,
       overlayChannel: '1',

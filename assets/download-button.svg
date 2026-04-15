@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="520" height="132" viewBox="0 0 520 132" role="img" aria-labelledby="title desc">
-  <title id="title">Download Bible Song Pro</title>
-  <desc id="desc">Large download button for the Bible Song Pro release package.</desc>
+  <title id="title">Download BibleRhythm AGL</title>
+  <desc id="desc">Large download button for the BibleRhythm AGL release package.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#178bff"/>
@@ -20,5 +20,5 @@
     <path d="M80 96h32"/>
   </g>
   <text x="150" y="56" fill="#d8ebff" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700" letter-spacing="0.12em">DOWNLOAD</text>
-  <text x="150" y="94" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="800">Bible Song Pro</text>
+  <text x="150" y="94" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="800">BibleRhythm AGL</text>
 </svg>

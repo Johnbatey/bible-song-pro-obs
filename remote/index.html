@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>BibleRhythm AGL — Remote Operator</title>
+<style>
+  :root {
+    --bg: #0a0d14;
+    --bg-elev: #12151d;
+    --border: rgba(255, 255, 255, 0.12);
+    --text: #e8eaed;
+    --text-dim: #9aa0a6;
+    --accent: #3ddc84;
+    --warn: #ffb64d;
+    --danger: #ff5252;
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 12px) env(safe-area-inset-bottom, 12px) env(safe-area-inset-left, 12px);
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 14px 8px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  header .status {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+  }
+  header .status .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6b7280;
+  }
+  header .status[data-state="ok"]   .dot { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  header .status[data-state="ok"]          { color: #b6f4ce; border-color: #175a34; }
+  header .status[data-state="warn"] .dot { background: var(--warn); box-shadow: 0 0 8px var(--warn); }
+  header .status[data-state="warn"]        { color: #ffd99a; border-color: #5a4217; }
+  header .status[data-state="err"]  .dot { background: var(--danger); box-shadow: 0 0 10px var(--danger); animation: pulse 1.2s ease-in-out infinite; }
+  header .status[data-state="err"]         { color: #ffb3b3; border-color: #5a1717; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+  main {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(4, 1fr);
+    gap: 12px;
+    padding: 10px 14px 0;
+  }
+  .btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 18px 14px;
+    background: var(--bg-elev);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: transform 0.08s ease, background 0.12s ease, border-color 0.12s ease;
+    box-shadow: var(--shadow);
+  }
+  .btn:active { transform: scale(0.97); background: #1b1f2a; }
+  .btn .sub { font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); }
+  .btn.wide { grid-column: span 2; }
+  .btn.tall { grid-row: span 2; font-size: 32px; }
+  .btn.accent { background: #0e3a3a; border-color: #175a5a; color: #80ffe0; }
+  .btn.accent:active { background: #0a2a2a; }
+  .btn.warn { background: #2a200a; border-color: #5a4217; color: #ffd580; }
+  .btn.warn:active { background: #3a2d0e; }
+  .btn.danger { background: #2a0a0a; border-color: #5a1717; color: #ffb3b3; }
+  .btn.danger:active { background: #3a0e0e; }
+  .btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+  footer {
+    padding: 10px 14px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  footer code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--text);
+  }
+  footer .settings-btn {
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  footer .settings-btn:active { background: rgba(255, 255, 255, 0.06); }
+
+  #settings-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 6, 10, 0.78);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 9000;
+  }
+  #settings-overlay.open { display: flex; }
+  #settings-overlay .sheet {
+    width: min(560px, 100%);
+    background: var(--bg-elev);
+    border-top: 1px solid var(--border);
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    padding: 18px 18px 24px;
+  }
+  #settings-overlay h2 { margin: 0 0 12px; font-size: 16px; }
+  #settings-overlay label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 10px 0 4px;
+  }
+  #settings-overlay input[type="text"] {
+    width: 100%;
+    background: #0a0d14;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  #settings-overlay .row {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  #settings-overlay .row button {
+    flex: 1 1 0;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  #settings-overlay .row button.primary { background: #0e3a3a; border-color: #175a5a; color: #80ffe0; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>BibleRhythm AGL — Remote</h1>
+    <span id="link-status" class="status" data-state="warn">
+      <span class="dot"></span>
+      <span id="link-status-label">Connecting…</span>
+    </span>
+  </header>
+
+  <main>
+    <button class="btn tall accent" data-command="slide.prev">◀ Prev<span class="sub">Previous slide</span></button>
+    <button class="btn tall accent" data-command="slide.next">Next ▶<span class="sub">Next slide</span></button>
+    <button class="btn" data-command="project.live">Go Live<span class="sub">Project current item</span></button>
+    <button class="btn warn" data-command="panic.logo">Logo<span class="sub">Panic logo</span></button>
+    <button class="btn danger" data-command="panic.clear">Clear<span class="sub">Clear output</span></button>
+    <button class="btn danger" data-command="panic.black">Black<span class="sub">Blackout</span></button>
+  </main>
+
+  <footer>
+    <span>Commands sent on channel <code id="footer-channel">bible_song_pro_v1</code></span>
+    <button class="settings-btn" id="settings-btn">Settings</button>
+  </footer>
+
+  <div id="settings-overlay">
+    <div class="sheet">
+      <h2>Remote settings</h2>
+      <label for="setting-channel">BroadcastChannel name</label>
+      <input type="text" id="setting-channel" placeholder="bible_song_pro_v1">
+      <label for="setting-relay">Relay WebSocket URL (optional)</label>
+      <input type="text" id="setting-relay" placeholder="ws://127.0.0.1:5511/">
+      <p style="margin:14px 0 0;font-size:11px;color:var(--text-dim)">
+        The remote sends commands over BroadcastChannel when the panel is on the same LAN-served
+        origin, or falls back to a relay WebSocket when configured. The command bus on the panel
+        dispatches each command through the registered handlers.
+      </p>
+      <div class="row">
+        <button id="setting-cancel">Cancel</button>
+        <button id="setting-save" class="primary">Save</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  // =============================================================
+  // BibleRhythm AGL — Remote Operator Client (P2 #15)
+  // =============================================================
+  //
+  // Minimal web client for a tablet on stage.  Sends COMMAND messages
+  // over the shared BroadcastChannel (same-origin) or a relay socket
+  // (configurable) to the panel's command bus.  The command bus
+  // dispatches them through the registered handlers so this client
+  // is fully decoupled from the panel's internal function names.
+  //
+  // Reachable via LAN IP when the panel's machine hosts index.html
+  // (or via the Cloudflare worker relay for WAN).  Opened full-screen
+  // on an iPad for hands-on worship leader control.
+  // =============================================================
+
+  const DEFAULT_CHANNEL_NAME = 'bible_song_pro_v1';
+  const DEFAULT_RELAY_URL = '';
+  const LS_PREFIX = 'bsp_remote_';
+
+  const state = {
+    channelName: DEFAULT_CHANNEL_NAME,
+    relayUrl: DEFAULT_RELAY_URL,
+    channel: null,
+    relaySocket: null,
+    lastResultAt: 0,
+    linkState: 'warn',
+    linkLabel: 'Connecting…'
+  };
+
+  function loadSetting(key, fallback) {
+    try {
+      const v = localStorage.getItem(LS_PREFIX + key);
+      return v == null ? fallback : v;
+    } catch (_) { return fallback; }
+  }
+  function saveSetting(key, value) {
+    try { localStorage.setItem(LS_PREFIX + key, String(value)); } catch (_) {}
+  }
+
+  function setLinkState(nextState, label) {
+    state.linkState = nextState;
+    state.linkLabel = label;
+    const el = document.getElementById('link-status');
+    const lbl = document.getElementById('link-status-label');
+    if (el) el.dataset.state = nextState;
+    if (lbl) lbl.textContent = label;
+  }
+
+  function closeChannel() {
+    if (state.channel) {
+      try { state.channel.close(); } catch (_) {}
+      state.channel = null;
+    }
+  }
+  function closeRelay() {
+    if (state.relaySocket) {
+      try { state.relaySocket.close(); } catch (_) {}
+      state.relaySocket = null;
+    }
+  }
+
+  function openChannel() {
+    closeChannel();
+    if (typeof BroadcastChannel !== 'function') return false;
+    try {
+      state.channel = new BroadcastChannel(state.channelName);
+      state.channel.onmessage = function (e) {
+        const d = (e && e.data) || {};
+        if (d.type === 'COMMAND_RESULT') {
+          state.lastResultAt = Date.now();
+          setLinkState('ok', 'Connected');
+        }
+        if (d.type === 'PONG' || d.type === 'HELLO' || d.type === 'SYNC_STATE') {
+          setLinkState('ok', 'Connected');
+        }
+      };
+      // Ping the panel on open so we know the channel is alive.
+      state.channel.postMessage({ type: 'PING', sender: 'remote', ts: Date.now() });
+      setLinkState('warn', 'Waiting for panel…');
+      return true;
+    } catch (_) { return false; }
+  }
+
+  function openRelay() {
+    closeRelay();
+    if (!state.relayUrl) return false;
+    try {
+      state.relaySocket = new WebSocket(state.relayUrl);
+      state.relaySocket.onopen = function () {
+        setLinkState('ok', 'Relay open');
+        try {
+          state.relaySocket.send(JSON.stringify({ type: 'HELLO', sender: 'remote', ts: Date.now() }));
+        } catch (_) {}
+      };
+      state.relaySocket.onclose = function () { setLinkState('err', 'Relay closed'); };
+      state.relaySocket.onerror = function () { setLinkState('err', 'Relay error'); };
+      state.relaySocket.onmessage = function (e) {
+        try {
+          const d = JSON.parse(e.data);
+          if (d.type === 'COMMAND_RESULT' || d.type === 'PONG' || d.type === 'SYNC_STATE') {
+            state.lastResultAt = Date.now();
+            setLinkState('ok', 'Relay connected');
+          }
+        } catch (_) {}
+      };
+      return true;
+    } catch (_) { return false; }
+  }
+
+  function sendCommand(id) {
+    const msg = {
+      type: 'COMMAND',
+      id: id,
+      sender: 'remote',
+      ts: Date.now(),
+      requestId: Math.random().toString(36).slice(2)
+    };
+    let sent = false;
+    if (state.channel) {
+      try { state.channel.postMessage(msg); sent = true; } catch (_) {}
+    }
+    if (state.relaySocket && state.relaySocket.readyState === 1) {
+      try { state.relaySocket.send(JSON.stringify(msg)); sent = true; } catch (_) {}
+    }
+    if (!sent) {
+      setLinkState('err', 'Not connected');
+    }
+    return sent;
+  }
+
+  // Fade the link state back to "warn" if we stop hearing from the panel
+  // for a while.  This surfaces silent disconnects to the operator.
+  function watchdog() {
+    setInterval(function () {
+      if (state.linkState === 'ok' && state.lastResultAt && Date.now() - state.lastResultAt > 15000) {
+        setLinkState('warn', 'No response 15s');
+      }
+      // Periodic ping to keep channels warm.
+      try {
+        if (state.channel) state.channel.postMessage({ type: 'PING', sender: 'remote', ts: Date.now() });
+        if (state.relaySocket && state.relaySocket.readyState === 1) {
+          state.relaySocket.send(JSON.stringify({ type: 'PING', sender: 'remote', ts: Date.now() }));
+        }
+      } catch (_) {}
+    }, 5000);
+  }
+
+  // ----- Settings overlay -----
+  function openSettings() {
+    document.getElementById('setting-channel').value = state.channelName;
+    document.getElementById('setting-relay').value = state.relayUrl;
+    document.getElementById('settings-overlay').classList.add('open');
+  }
+  function closeSettings() {
+    document.getElementById('settings-overlay').classList.remove('open');
+  }
+  function saveSettings() {
+    const ch = document.getElementById('setting-channel').value.trim() || DEFAULT_CHANNEL_NAME;
+    const relay = document.getElementById('setting-relay').value.trim();
+    state.channelName = ch;
+    state.relayUrl = relay;
+    saveSetting('channelName', ch);
+    saveSetting('relayUrl', relay);
+    document.getElementById('footer-channel').textContent = ch;
+    openChannel();
+    if (relay) openRelay();
+    else closeRelay();
+    closeSettings();
+  }
+
+  // ----- Wire up buttons -----
+  function init() {
+    state.channelName = loadSetting('channelName', DEFAULT_CHANNEL_NAME);
+    state.relayUrl = loadSetting('relayUrl', DEFAULT_RELAY_URL);
+    document.getElementById('footer-channel').textContent = state.channelName;
+
+    document.querySelectorAll('[data-command]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const id = btn.getAttribute('data-command');
+        if (!id) return;
+        sendCommand(id);
+        // Visual feedback: flash the button briefly.
+        btn.style.transform = 'scale(0.94)';
+        setTimeout(function () { btn.style.transform = ''; }, 120);
+      });
+    });
+
+    document.getElementById('settings-btn').addEventListener('click', openSettings);
+    document.getElementById('setting-cancel').addEventListener('click', closeSettings);
+    document.getElementById('setting-save').addEventListener('click', saveSettings);
+    document.getElementById('settings-overlay').addEventListener('click', function (e) {
+      if (e.target && e.target.id === 'settings-overlay') closeSettings();
+    });
+
+    openChannel();
+    if (state.relayUrl) openRelay();
+    watchdog();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

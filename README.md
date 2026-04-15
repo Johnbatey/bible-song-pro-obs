@@ -1,4 +1,4 @@
-# Bible Song Pro – OBS Overlay for Bible Verses & Song Lyrics
+# BibleRhythm AGL – OBS Overlay for Bible Verses & Song Lyrics
 
 A modern church presentation system for OBS Studio that lets you display Bible verses and song lyrics in real-time.
 
@@ -52,7 +52,7 @@ A modern church presentation system for OBS Studio that lets you display Bible v
 
 ## Built for Churches
 
-Bible Song Pro is designed to help churches and ministries present scripture and song lyrics beautifully during live streams without complex software.
+BibleRhythm AGL is designed to help churches and ministries present scripture and song lyrics beautifully during live streams without complex software.
 
 ---
 
@@ -69,7 +69,7 @@ Get the latest version here:
 [https://github.com/Johnbatey/bible-song-pro-obs/releases/latest](https://github.com/Johnbatey/bible-song-pro-obs/releases/latest)
 
 <a href="https://github.com/Johnbatey/bible-song-pro-obs/releases/latest">
-  <img src="assets/download-button.svg" alt="Download Bible Song Pro" height="132">
+  <img src="assets/download-button.svg" alt="Download BibleRhythm AGL" height="132">
 </a>
 
 ---

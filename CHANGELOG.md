@@ -1,10 +1,10 @@
 # Changelog
 
-All notable changes to `Bible Song Pro` should be documented in this file.
+All notable changes to `BibleRhythm AGL` should be documented in this file.
 
 ## Version 2.0.0
 
-Major release focused on productizing Bible Song Pro beyond the original two-file OBS package while keeping OBS workflows central.
+Major release focused on productizing BibleRhythm AGL beyond the original two-file OBS package while keeping OBS workflows central.
 
 ### Added
 

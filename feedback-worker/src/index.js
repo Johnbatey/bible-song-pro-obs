@@ -54,7 +54,7 @@ function normalizeIssueBody(payload) {
     ...details.map((item) => `- ${item}`),
     '',
     '---',
-    '*This issue was automatically created from Bible Song Pro in-app feedback.*'
+    '*This issue was automatically created from BibleRhythm AGL in-app feedback.*'
   ].join('\n').trim();
 }
 
